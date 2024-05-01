@@ -250,26 +250,49 @@ class Schedule:
             #     self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_AVAILABILITY, conflictBetweenClasses))
 
         # need to find fix for credit hours constraint
-        for i in classes:
-            if i.course.creditHours == 2 or i.course.creditHours == 3:
-                if int(i.course.c2.meetingTime.id[2:]) != (int(i.course.c1.meetingTime.id[2:]) + 1):
-                    creditHoursConflict = []
-                    creditHoursConflict.append(classes[i])
-                    self._conflicts.append(Conflict(Conflict.ConflictType.CREDIT_HOURS, creditHoursConflict))
+        # for i in classes:
+        #     if i._course._creditHours == 2 or i._course._creditHours == 3:
+        #         if int(i._course.c2._meetingTime._id[2:]) != (int(i._course.c1._meetingTime._id[2:]) + 1):
+        #             creditHoursConflict = []
+        #             creditHoursConflict.append(i)
+        #             self._conflicts.append(Conflict(Conflict.ConflictType.CREDIT_HOURS, creditHoursConflict))
 
-            for j in range(0, len(classes)):
-                if (j >= i):
-                    if (classes[i].get_meetingTime() == classes[j].get_meetingTime() and
-                    classes[i].get_id() != classes[j].get_id()):
-                        if (classes[i].get_room() == classes[j].get_room()):
+        #     for j in range(0, len(classes)):
+        #         if (j >= i):
+        #             if (classes[i].get_meetingTime() == classes[j].get_meetingTime() and
+        #             classes[i].get_id() != classes[j].get_id()):
+        #                 if (classes[i].get_room() == classes[j].get_room()):
+        #                     roomBookingConflict = list()
+        #                     roomBookingConflict.append(classes[i])
+        #                     roomBookingConflict.append(classes[j])
+        #                     self._conflicts.append(Conflict(Conflict.ConflictType.ROOM_BOOKING, roomBookingConflict))
+        #                 if (classes[i].get_instructor() == classes[j].get_instructor()):
+        #                     instructorBookingConflict = list()
+        #                     instructorBookingConflict.append(classes[i])
+        #                     instructorBookingConflict.append(classes[j])
+        #                     self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
+        # return 1 / ((1.0 * len(self._conflicts) + 1))
+
+        # need to find fix for credit hours constraint
+        for index_i, i in enumerate(classes):
+            if i._course._creditHours == 2 or i._course._creditHours == 3:  # corrected line
+                if int(i._course.c2._meetingTime._id[2:]) != (int(i._course.c1._meetingTime._id[2:]) + 1):  # corrected line
+                    creditHoursConflict = []
+                    creditHoursConflict.append(i)
+                    self._conflicts.append(Conflict(Conflict.ConflictType.CREDIT_HOURS, creditHoursConflict))
+        
+            for index_j, j in enumerate(classes):
+                if (index_j >= index_i):  # corrected line
+                    if (i.get_meetingTime() == j.get_meetingTime() and i.get_id() != j.get_id()):
+                        if (i.get_room() == j.get_room()):
                             roomBookingConflict = list()
-                            roomBookingConflict.append(classes[i])
-                            roomBookingConflict.append(classes[j])
+                            roomBookingConflict.append(i)
+                            roomBookingConflict.append(j)
                             self._conflicts.append(Conflict(Conflict.ConflictType.ROOM_BOOKING, roomBookingConflict))
-                        if (classes[i].get_instructor() == classes[j].get_instructor()):
+                        if (i.get_instructor() == j.get_instructor()):
                             instructorBookingConflict = list()
-                            instructorBookingConflict.append(classes[i])
-                            instructorBookingConflict.append(classes[j])
+                            instructorBookingConflict.append(i)
+                            instructorBookingConflict.append(j)
                             self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
         return 1 / ((1.0 * len(self._conflicts) + 1))
     
@@ -325,39 +348,37 @@ class GeneticAlgorithm:
 
         stopper = True
         block = []
-        while stopper == True:
+        while stopper:
             for i in crossoverSchedule.get_classes():
-                if i.course.creditHours == 2 or i.course.creditHours == 3:
-                    if int(i.course.c2.meetingTime.id[2:]) != (int(i.course.c1.meetingTime.id[2:]) + 1):
+                if i._course._creditHours == 2 or i._course._creditHours == 3:
+                    if int(i._course.c2._meetingTime._id[2:]) != (int(i._course.c1._meetingTime._id[2:]) + 1):
                         block.append(False)
                         crossoverSchedule = Schedule().initialize()
                         break
                     else:
-                        if False not in block:
-                            stopper = False
-                            break
-            
+                        block.append(True)
+            if False not in block:
+                stopper = False
 
         return crossoverSchedule
 
     def _mutate_schedule(self, mutateSchedule):
         stopper = True
-        while stopper == True:
-            block = []
+        block = []
+        while stopper:
             schedule = Schedule().initialize()
             for i in range(0, len(mutateSchedule.get_classes())):
                 if MUTATION_RATE > rnd.random():
                     mutated_class = schedule.get_classes()[i]
-                    if mutated_class.course.creditHours == 2 or mutated_class.course.creditHours == 3:
-                        if int(mutated_class.course.c2.meetingTime.id[2:]) != (int(mutated_class.course.c1.meetingTime.id[2:]) + 1):
+                    if mutated_class._course._creditHours == 2 or mutated_class._course._creditHours == 3:
+                        if int(mutated_class._course.c2._meetingTime._id[2:]) != (int(mutated_class._course.c1._meetingTime._id[2:]) + 1):
                             block.append(False)
                             mutateSchedule = Schedule().initialize()
                             break
                         else:
-                            if False not in block:
-                                stopper = False
-                                mutateSchedule.get_classes()[i] = mutated_class
-                                break
+                            block.append(True)
+            if False not in block:
+                stopper = False
         return mutateSchedule
 
     def _select_tournament_population(self, pop):
