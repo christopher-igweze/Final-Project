@@ -1,0 +1,26 @@
+import pandas as pd
+import sqlite3
+
+# Load spreadsheet
+xl = pd.ExcelFile('Book2.xlsx')
+
+# Load a sheet into a DataFrame
+df = xl.parse('Sheet1')  # Change 'Sheet1' to the name of your sheet
+
+# Load the second sheet into a DataFrame
+df2 = xl.parse('Sheet2')  # Change 'Sheet2' to the name of your second sheet
+
+# Get the 'subscript' column
+subscript = df2['subscript']
+
+# Make a connection to the SQLite database
+conn = sqlite3.connect('class_schedule-01.db')
+
+# Add 'subscript' as a new column to the 'meeting_time' table
+subscript.to_sql('meeting_time', conn, if_exists='replace', index=False)
+
+# Write records stored in a DataFrame to a SQL database
+df.to_sql('instructor_availability', conn, if_exists='replace', index=False)  # Change 'table_name' to the name of your table
+
+# Don't forget to close the connection
+conn.close()
