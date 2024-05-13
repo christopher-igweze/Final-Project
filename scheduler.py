@@ -1,15 +1,23 @@
+# Importing necessary libraries
 import sqlite3 as sqlite
 import prettytable as prettytable
 import random as rnd
 from enum import Enum
 
+# Initial declaations some global variables
 POPULATION_SIZE = 1000
 NUMB_OF_ELITE_SCHEDULES = 1
 TOURNAMENT_SELECTION_SIZE = 3
 MUTATION_RATE = 0.1
 VERBOSE_FLAG = False
 
+# CLASS DEFINITIONS
+
+# Class to manage the database and all the data retrieval
 class DBMgr:
+
+    # Constructor for the class
+    # need to add more the new tables
     def __init__(self):
         self._conn = sqlite.connect('class_schedule-01.db')
         self._c = self._conn.cursor()
@@ -22,10 +30,8 @@ class DBMgr:
         for i in range(0, len(self._depts)):
             self._numberOfClasses += len(self._depts[i].get_courses())
 
+    # Returns the list of rooms. [room number, room seating capacity]
     def _select_rooms(self):
-
-        ''' Returns the list of rooms. A class with the first data as the room number and the data as the seating capacity '''
-
         self._c.execute("SELECT * FROM room")
         rooms = self._c.fetchall()
         returnRooms = []
@@ -33,11 +39,8 @@ class DBMgr:
             returnRooms.append(Room(rooms[i][0], rooms[i][1]))
         return returnRooms
     
-
+    # Returns the list of meeting times. [id, meetingtime(day, 1-hour period), subscript(day)]
     def _select_meeting_times(self):
-
-        ''' Returns the list of meeting times. A class with the first data as the meeting id and the second as the meeting time'''
-
         self._c.execute("SELECT * FROM meeting_time")
         meetingTimes = self._c.fetchall()
         returnMeetingTimes = []
@@ -45,12 +48,9 @@ class DBMgr:
             returnMeetingTimes.append(MeetingTime(meetingTimes[i][0], meetingTimes[i][1], meetingTimes[i][2]))
         return returnMeetingTimes
     
-
+    # Returns the list of instructors. [id, name]
+    # The instructor availability is a list of all meeting IDs the instructor is available (I am going to eventually remove the availability)
     def _select_instructors(self):
-
-        ''' Returns the list of instructors. A class with the instructor id, instructor name and instructor's availability as data types
-        The instructor availability is a list of all meeting IDs the instructor is available'''
-
         self._c.execute("SELECT * FROM instructor")
         instructors = self._c.fetchall()
         returnInstructors = []
@@ -58,11 +58,8 @@ class DBMgr:
             returnInstructors.append(Instructor(instructors[i][0], instructors[i][1], self._select_instructor_availability(instructors[i][0])))
         return returnInstructors
     
-
+    # Returns the instructors availability. A list of all meeting IDs the instructor is available (I have to take this function down)
     def _select_instructor_availability(self, instructor):
-
-        ''' Returns the instructors availability. A list of all meeting IDs the instructor is available'''
-
         self._c.execute("SELECT * from instructor_availability where instructor_id = '" + instructor + "'")
         instructorMTsRS = self._c.fetchall()
         instructorMTs = []
@@ -73,25 +70,20 @@ class DBMgr:
                 instructorAvailability.append(self._meetingTimes[i])
         return instructorAvailability
     
-
+    # Returns the list of courses. [id, name, instructors, max number of students, credit hours], 
+    # max number of students and the credits hours
     def _select_courses(self):
-
-        ''' Returns the list of courses. A class with the number, name, list of instructors (the class), 
-        max number of students and the credits hours '''
-
         self._c.execute("SELECT * FROM course")
         courses = self._c.fetchall()
         returnCourses = []
         for i in range(0, len(courses)):
             returnCourses.append(
                 Course(courses[i][0], courses[i][1], self._select_course_instructors(courses[i][0]), 
-                        courses[i][2], courses[i][3]))  # Fetch credit hours (assuming it's the 4th column)
+                        courses[i][2], courses[i][3]))
         return returnCourses
 
+    # Returns the list of departments. [depts, courses]
     def _select_depts(self):
-
-        ''' Returns the list of departments. A class consisting of the name and a list of the courses department '''
-
         self._c.execute("SELECT * FROM dept")
         depts = self._c.fetchall()
         returnDepts = []
@@ -99,10 +91,8 @@ class DBMgr:
             returnDepts.append(Department(depts[i][0], self._select_dept_courses(depts[i][0])))
         return returnDepts
     
+    # Returns the list of instructors for a course. [course id, instructor id]
     def _select_course_instructors(self, courseNumber):
-
-        ''' Returns the list of instructors doing a course. '''
-
         self._c.execute("SELECT * FROM course_instructor where course_number == '" + courseNumber + "'")
         dbInstructorNumbers = self._c.fetchall()
         instructorNumbers = []
@@ -114,10 +104,8 @@ class DBMgr:
                returnValue.append(self._instructors[i])
         return returnValue
     
+    # Returns the list of courses for a department. [dept name, course id]
     def _select_dept_courses(self, deptName):
-
-        ''' Returns the list of courses in a department. '''
-
         self._c.execute("SELECT * FROM dept_course where name == '" + deptName + "'")
         dbCourseNumbers = self._c.fetchall()
         courseNumbers = []
@@ -136,7 +124,10 @@ class DBMgr:
     def get_meetingTimes(self): return self._meetingTimes
     def get_numberOfClasses(self): return self._numberOfClasses
 
+# Class to manage the scheduling process
 class Schedule:
+
+    # Constructor for the class
     def __init__(self):
         self._data = dbMgr
         self._classes = []
@@ -145,19 +136,23 @@ class Schedule:
         self._classNumb = 0
         self._isFitnessChanged = True
 
+    # Returns the list of classes(as in lectures) for the schedule
     def get_classes(self):
         self._isFitnessChanged = True
         return self._classes
 
+    # Returns the list of conflicts for the schedule
     def get_conflicts(self):
         return self._conflicts
 
+    # Returns the fitness of the schedule
     def get_fitness(self):
         if self._isFitnessChanged:
             self._fitness = self.calculate_fitness()
             self._isFitnessChanged = False
         return self._fitness
 
+    # Initializes the schedule
     def initialize(self):
         depts = self._data.get_depts()
         for dept in depts:
@@ -235,6 +230,7 @@ class Schedule:
                     course.c3 = class3
         return self
 
+    # Calculates the fitness of the schedule
     def calculate_fitness(self):
         self._conflicts = []
         classes = self.get_classes()
