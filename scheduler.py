@@ -262,24 +262,40 @@ class Schedule:
 
         # Here lies the code for the other conflicts. sort them out later
 
-        #     for index_j, j in enumerate(classes):
-        #         if (index_j >= index_i):  # corrected line
-        #             if (i.get_meetingTime() == j.get_meetingTime() and i.get_id() != j.get_id()):
-        #                 if (i.get_room() == j.get_room()):
-        #                     roomBookingConflict = list()
-        #                     roomBookingConflict.append(i)
-        #                     roomBookingConflict.append(j)
-        #                     self._conflicts.append(Conflict(Conflict.ConflictType.ROOM_BOOKING, roomBookingConflict))
-        #                 if (i.get_instructor() == j.get_instructor()):
-        #                     instructorBookingConflict = list()
-        #                     instructorBookingConflict.append(i)
-        #                     instructorBookingConflict.append(j)
-        #                     self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
+            # for index_j, j in enumerate(classes):
+            #     if (index_j >= index_j):  # corrected line
+            #         if (i.get_meetingTime() == j.get_meetingTime() and i.get_id() != j.get_id()):
+            #             if (i.get_room() == j.get_room()):
+            #                 roomBookingConflict = list()
+            #                 roomBookingConflict.append(i)
+            #                 roomBookingConflict.append(j)
+            #                 self._conflicts.append(Conflict(Conflict.ConflictType.ROOM_BOOKING, roomBookingConflict))
+            #             if (i.get_instructor() == j.get_instructor()):
+            #                 instructorBookingConflict = list()
+            #                 instructorBookingConflict.append(i)
+            #                 instructorBookingConflict.append(j)
+            #                 self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
+
+            for j in range(0, len(classes)):
+                if (j >= i):
+                    if (classes[i].get_meetingTime() == classes[j].get_meetingTime() and
+                    classes[i].get_id() != classes[j].get_id()):
+                        if (classes[i].get_room() == classes[j].get_room()):
+                            roomBookingConflict = list()
+                            roomBookingConflict.append(classes[i])
+                            roomBookingConflict.append(classes[j])
+                            self._conflicts.append(Conflict(Conflict.ConflictType.ROOM_BOOKING, roomBookingConflict))
+                        if (classes[i].get_instructor() == classes[j].get_instructor()):
+                            instructorBookingConflict = list()
+                            instructorBookingConflict.append(classes[i])
+                            instructorBookingConflict.append(classes[j])
+                            self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
 
 
         # I need to work on the fitness function so it assigns weights to the conflicts.
-        # The weights would be the multiplicative factor, i'll figure out what the plus one does later.
+        # The weights would be the multiplicative factor
         # For multiple weights add them in the denominator
+        # The plus one makes it such that when the number of conflicts is zero the total fitness would be one
         return 1 / ((1.0 * len(self._conflicts) + 1))
     
     def __str__(self):
