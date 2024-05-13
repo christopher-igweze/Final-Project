@@ -332,23 +332,23 @@ class GeneticAlgorithm:
         #     crossoverSchedule = Schedule().initialize()
         #     total_credit_hours = sum(class_.get_course().get_credit_hours() for class_ in crossoverSchedule.get_classes())
 
-        stopper = True
-        block = []
-        while stopper:
-            for i in crossoverSchedule.get_classes():
-                if i.get_course().get_credit_hours() == 2 or i.get_course().get_credit_hours() == 3:
-                    if int(i.get_course().get_class1().get_meetingTime().get_id[2:]) != (int(i.get_course().get_class2().get_meetingTime().get_id[2:]) + 1):
-                        block.append(False)
-                        crossoverSchedule = Schedule().initialize()
-                        break
-                    else:
-                        block.append(True)
-            if False not in block:
-                stopper = False
+        # stopper = True
+        # block = []
+        # while stopper:
+        #     for i in crossoverSchedule.get_classes():
+        #         if i.get_course().get_credit_hours() == 2 or i.get_course().get_credit_hours() == 3:
+        #             if int(i.get_course().get_class1().get_meetingTime().get_id()[2:]) != (int(i.get_course().get_class2().get_meetingTime().get_id()[2:]) + 1):
+        #                 block.append(False)
+        #                 crossoverSchedule = Schedule().initialize()
+        #                 break
+        #             else:
+        #                 block.append(True)
+        #     if False not in block:
+        #         stopper = False
 
         return crossoverSchedule
 
-    def _mutate_schedule(self, mutateSchedule):
+    # def _mutate_schedule(self, mutateSchedule):
         stopper = True
         block = []
         while stopper:
@@ -365,6 +365,12 @@ class GeneticAlgorithm:
                             block.append(True)
             if False not in block:
                 stopper = False
+        return mutateSchedule
+
+    def _mutate_schedule(self, mutateSchedule):
+        schedule = Schedule().initialize()
+        for i in range(0, len(mutateSchedule.get_classes())):
+            if(MUTATION_RATE > rnd.random()): mutateSchedule.get_classes()[i] = schedule.get_classes()[i]
         return mutateSchedule
 
     def _select_tournament_population(self, pop):
