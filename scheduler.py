@@ -168,13 +168,13 @@ class Schedule:
                     instructors = course.get_instructors()
                     newClass.set_instructor(instructors[rnd.randrange(0, len(instructors))])
                     self._classes.append(newClass)
-                    course.c1 = newClass
+                    course.set_class1(newClass)
 
                 if course.get_credit_hours() == 2:
                     class1 = Class(self._classNumb, dept, course)
                     self._classNumb += 1
                     index = rnd.randrange(0, len(dbMgr.get_meetingTimes())-1)
-                    if meeting_times[index].get_sub() != meeting_times[index + 1].get_sub(): index -= 1
+                    if meeting_times[index].get_sub() != meeting_times[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
                     class1.set_meetingTime(dbMgr.get_meetingTimes()[index])
                     room = rnd.randrange(0, len(dbMgr.get_rooms()))
                     class1.set_room(dbMgr.get_rooms()[room])
@@ -190,8 +190,8 @@ class Schedule:
                     class2.set_instructor(instructors[rnd.randrange(0, len(instructors))])
                     self._classes.append(class2)
 
-                    course.c1 = class1
-                    course.c2 = class2
+                    course.set_class1(class1)
+                    course.set_class2(class2)
 
                 if course.get_credit_hours() == 3:
                     
@@ -225,71 +225,61 @@ class Schedule:
                     class3.set_instructor(instructors[rnd.randrange(0, len(instructors))])
                     self._classes.append(class3)
                     
-                    course.c1 = class1
-                    course.c2 = class2
-                    course.c3 = class3
+                    course.set_class1(class1)
+                    course.set_class2(class2)
+                    course.set_class3(class3)
         return self
 
     # Calculates the fitness of the schedule
     def calculate_fitness(self):
         self._conflicts = []
         classes = self.get_classes()
-        # credit_hours_count = {1: 0, 2: 0, 3: 0}
         for i in range(0, len(classes)):
+            # Seating Capacity Constraint
             seatingCapacityConflict = list()
             seatingCapacityConflict.append(classes[i])
             if (classes[i].get_room().get_seatingCapacity() < classes[i].get_course().get_maxNumbOfStudents()):
                 self._conflicts.append(Conflict(Conflict.ConflictType.NUMB_OF_STUDENTS, seatingCapacityConflict))
+
+            # Credit Hour Constraint
+            creditHourConflict = list()
+            creditHourConflict.append(classes[i])
+            course = classes[i].get_course()
+            unit = course.get_credit_hours()
+            if unit > 1:
+                period1 = int(course.get_class1().get_meetingTime().get_id()[2:])
+                period2 = int(course.get_class2().get_meetingTime().get_id()[2:])
+                if period2 != (period1 + 1):
+                    self._conflicts.append(Conflict(Conflict.ConflictType.CREDIT_HOURS, creditHourConflict))
+
+            # Here I removed the instructor availability since all lectures are available through the week except for chapel days (Tue / Thur)
+            # I need to create a new table for dept-instructor so that you can assign instructors to specific departments to make the availability work
             # if (classes[i].get_meetingTime() not in classes[i].get_instructor().get_availability()):
             #     conflictBetweenClasses = list()
             #     conflictBetweenClasses.append(classes[i])
             #     self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_AVAILABILITY, conflictBetweenClasses))
-
-        # need to find fix for credit hours constraint
-        # for i in classes:
-        #     if i._course._creditHours == 2 or i._course._creditHours == 3:
-        #         if int(i._course.c2._meetingTime._id[2:]) != (int(i._course.c1._meetingTime._id[2:]) + 1):
-        #             creditHoursConflict = []
-        #             creditHoursConflict.append(i)
-        #             self._conflicts.append(Conflict(Conflict.ConflictType.CREDIT_HOURS, creditHoursConflict))
-
-        #     for j in range(0, len(classes)):
-        #         if (j >= i):
-        #             if (classes[i].get_meetingTime() == classes[j].get_meetingTime() and
-        #             classes[i].get_id() != classes[j].get_id()):
-        #                 if (classes[i].get_room() == classes[j].get_room()):
-        #                     roomBookingConflict = list()
-        #                     roomBookingConflict.append(classes[i])
-        #                     roomBookingConflict.append(classes[j])
-        #                     self._conflicts.append(Conflict(Conflict.ConflictType.ROOM_BOOKING, roomBookingConflict))
-        #                 if (classes[i].get_instructor() == classes[j].get_instructor()):
-        #                     instructorBookingConflict = list()
-        #                     instructorBookingConflict.append(classes[i])
-        #                     instructorBookingConflict.append(classes[j])
-        #                     self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
-        # return 1 / ((1.0 * len(self._conflicts) + 1))
-
-        # need to find fix for credit hours constraint
-        for index_i, i in enumerate(classes):
-            if i._course._creditHours == 2 or i._course._creditHours == 3:  # corrected line
-                if int(i._course.c2._meetingTime._id[2:]) != (int(i._course.c1._meetingTime._id[2:]) + 1):  # corrected line
-                    creditHoursConflict = []
-                    creditHoursConflict.append(i)
-                    self._conflicts.append(Conflict(Conflict.ConflictType.CREDIT_HOURS, creditHoursConflict))
         
-            for index_j, j in enumerate(classes):
-                if (index_j >= index_i):  # corrected line
-                    if (i.get_meetingTime() == j.get_meetingTime() and i.get_id() != j.get_id()):
-                        if (i.get_room() == j.get_room()):
-                            roomBookingConflict = list()
-                            roomBookingConflict.append(i)
-                            roomBookingConflict.append(j)
-                            self._conflicts.append(Conflict(Conflict.ConflictType.ROOM_BOOKING, roomBookingConflict))
-                        if (i.get_instructor() == j.get_instructor()):
-                            instructorBookingConflict = list()
-                            instructorBookingConflict.append(i)
-                            instructorBookingConflict.append(j)
-                            self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
+
+        # Here lies the code for the other conflicts. sort them out later
+
+        #     for index_j, j in enumerate(classes):
+        #         if (index_j >= index_i):  # corrected line
+        #             if (i.get_meetingTime() == j.get_meetingTime() and i.get_id() != j.get_id()):
+        #                 if (i.get_room() == j.get_room()):
+        #                     roomBookingConflict = list()
+        #                     roomBookingConflict.append(i)
+        #                     roomBookingConflict.append(j)
+        #                     self._conflicts.append(Conflict(Conflict.ConflictType.ROOM_BOOKING, roomBookingConflict))
+        #                 if (i.get_instructor() == j.get_instructor()):
+        #                     instructorBookingConflict = list()
+        #                     instructorBookingConflict.append(i)
+        #                     instructorBookingConflict.append(j)
+        #                     self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
+
+
+        # I need to work on the fitness function so it assigns weights to the conflicts.
+        # The weights would be the multiplicative factor, i'll figure out what the plus one does later.
+        # For multiple weights add them in the denominator
         return 1 / ((1.0 * len(self._conflicts) + 1))
     
     def __str__(self):
@@ -346,8 +336,8 @@ class GeneticAlgorithm:
         block = []
         while stopper:
             for i in crossoverSchedule.get_classes():
-                if i._course._creditHours == 2 or i._course._creditHours == 3:
-                    if int(i._course.c2._meetingTime._id[2:]) != (int(i._course.c1._meetingTime._id[2:]) + 1):
+                if i.get_course().get_credit_hours() == 2 or i.get_course().get_credit_hours() == 3:
+                    if int(i.get_course().get_class1().get_meetingTime().get_id[2:]) != (int(i.get_course().get_class2().get_meetingTime().get_id[2:]) + 1):
                         block.append(False)
                         crossoverSchedule = Schedule().initialize()
                         break
@@ -366,8 +356,8 @@ class GeneticAlgorithm:
             for i in range(0, len(mutateSchedule.get_classes())):
                 if MUTATION_RATE > rnd.random():
                     mutated_class = schedule.get_classes()[i]
-                    if mutated_class._course._creditHours == 2 or mutated_class._course._creditHours == 3:
-                        if int(mutated_class._course.c2._meetingTime._id[2:]) != (int(mutated_class._course.c1._meetingTime._id[2:]) + 1):
+                    if mutated_class.get_course().get_credit_hours() == 2 or mutated_class.get_course().get_credit_hours() == 3:
+                        if int(mutated_class.get_course().get_class1().get_meetingTime().get_id[2:]) != (int(mutated_class.get_course().get_class2().get_meetingTime().get_id[2:]) + 1):
                             block.append(False)
                             mutateSchedule = Schedule().initialize()
                             break
@@ -400,6 +390,12 @@ class Course:
     def get_instructors(self): return self._instructors
     def get_maxNumbOfStudents(self): return self._maxNumbOfStudents
     def get_credit_hours(self): return self._creditHours
+    def get_class1(self): return self._c1
+    def get_class2(self): return self._c2
+    def get_class3(self): return self._c3
+    def set_class1(self, period): self._c1 = period
+    def set_class2(self, period): self._c2 = period
+    def set_class3(self, period): self._c3 = period
     def __str__(self): return self._name
 class Instructor:
     def __init__(self, id, name, availability):
