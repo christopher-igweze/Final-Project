@@ -1,23 +1,15 @@
-# Importing necessary libraries
 import sqlite3 as sqlite
 import prettytable as prettytable
 import random as rnd
 from enum import Enum
 
-# Initial declaations some global variables
 POPULATION_SIZE = 1000
 NUMB_OF_ELITE_SCHEDULES = 1
 TOURNAMENT_SELECTION_SIZE = 3
 MUTATION_RATE = 0.1
 VERBOSE_FLAG = False
 
-# CLASS DEFINITIONS
-
-# Class to manage the database and all the data retrieval
 class DBMgr:
-
-    # Constructor for the class
-    # need to add more the new tables
     def __init__(self):
         self._conn = sqlite.connect('class_schedule-01.db')
         self._c = self._conn.cursor()
@@ -30,36 +22,47 @@ class DBMgr:
         for i in range(0, len(self._depts)):
             self._numberOfClasses += len(self._depts[i].get_courses())
 
-    # Returns the list of rooms. [room number, room seating capacity]
     def _select_rooms(self):
+
+        ''' Returns the list of rooms. A class with the first data as the room number and the data as the seating capacity '''
+
         self._c.execute("SELECT * FROM room")
         rooms = self._c.fetchall()
         returnRooms = []
         for i in range(0, len(rooms)):
             returnRooms.append(Room(rooms[i][0], rooms[i][1]))
         return returnRooms
-    
-    # Returns the list of meeting times. [id, meetingtime(day, 1-hour period), subscript(day)]
+
+
     def _select_meeting_times(self):
+
+        ''' Returns the list of meeting times. A class with the first data as the meeting id and the second as the meeting time'''
+
         self._c.execute("SELECT * FROM meeting_time")
         meetingTimes = self._c.fetchall()
         returnMeetingTimes = []
         for i in range(0, len(meetingTimes)):
             returnMeetingTimes.append(MeetingTime(meetingTimes[i][0], meetingTimes[i][1], meetingTimes[i][2]))
         return returnMeetingTimes
-    
-    # Returns the list of instructors. [id, name]
-    # The instructor availability is a list of all meeting IDs the instructor is available (I am going to eventually remove the availability)
+
+
     def _select_instructors(self):
+
+        ''' Returns the list of instructors. A class with the instructor id, instructor name and instructor's availability as data types
+        The instructor availability is a list of all meeting IDs the instructor is available'''
+
         self._c.execute("SELECT * FROM instructor")
         instructors = self._c.fetchall()
         returnInstructors = []
         for i in range(0, len(instructors)):
             returnInstructors.append(Instructor(instructors[i][0], instructors[i][1], self._select_instructor_availability(instructors[i][0])))
         return returnInstructors
-    
-    # Returns the instructors availability. A list of all meeting IDs the instructor is available (I have to take this function down)
+
+
     def _select_instructor_availability(self, instructor):
+
+        ''' Returns the instructors availability. A list of all meeting IDs the instructor is available'''
+
         self._c.execute("SELECT * from instructor_availability where instructor_id = '" + instructor + "'")
         instructorMTsRS = self._c.fetchall()
         instructorMTs = []
@@ -69,30 +72,37 @@ class DBMgr:
             if self._meetingTimes[i].get_id() in instructorMTs:
                 instructorAvailability.append(self._meetingTimes[i])
         return instructorAvailability
-    
-    # Returns the list of courses. [id, name, instructors, max number of students, credit hours], 
-    # max number of students and the credits hours
+
+
     def _select_courses(self):
+
+        ''' Returns the list of courses. A class with the number, name, list of instructors (the class), 
+        max number of students and the credits hours '''
+
         self._c.execute("SELECT * FROM course")
         courses = self._c.fetchall()
         returnCourses = []
         for i in range(0, len(courses)):
             returnCourses.append(
                 Course(courses[i][0], courses[i][1], self._select_course_instructors(courses[i][0]), 
-                        courses[i][2], courses[i][3]))
+                        courses[i][2], courses[i][3]))  # Fetch credit hours (assuming it's the 4th column)
         return returnCourses
 
-    # Returns the list of departments. [depts, courses]
     def _select_depts(self):
+
+        ''' Returns the list of departments. A class consisting of the name and a list of the courses department '''
+
         self._c.execute("SELECT * FROM dept")
         depts = self._c.fetchall()
         returnDepts = []
         for i in range(0, len(depts)):
             returnDepts.append(Department(depts[i][0], self._select_dept_courses(depts[i][0])))
         return returnDepts
-    
-    # Returns the list of instructors for a course. [course id, instructor id]
+
     def _select_course_instructors(self, courseNumber):
+
+        ''' Returns the list of instructors doing a course. '''
+
         self._c.execute("SELECT * FROM course_instructor where course_number == '" + courseNumber + "'")
         dbInstructorNumbers = self._c.fetchall()
         instructorNumbers = []
@@ -103,9 +113,11 @@ class DBMgr:
            if  self._instructors[i].get_id() in instructorNumbers:
                returnValue.append(self._instructors[i])
         return returnValue
-    
-    # Returns the list of courses for a department. [dept name, course id]
+
     def _select_dept_courses(self, deptName):
+
+        ''' Returns the list of courses in a department. '''
+
         self._c.execute("SELECT * FROM dept_course where name == '" + deptName + "'")
         dbCourseNumbers = self._c.fetchall()
         courseNumbers = []
@@ -116,7 +128,7 @@ class DBMgr:
            if self._courses[i].get_number() in courseNumbers:
                returnValue.append(self._courses[i])
         return returnValue
-    
+
     def get_rooms(self): return self._rooms
     def get_instructors(self): return self._instructors
     def get_courses(self): return self._courses
@@ -124,10 +136,7 @@ class DBMgr:
     def get_meetingTimes(self): return self._meetingTimes
     def get_numberOfClasses(self): return self._numberOfClasses
 
-# Class to manage the scheduling process
 class Schedule:
-
-    # Constructor for the class
     def __init__(self):
         self._data = dbMgr
         self._classes = []
@@ -136,23 +145,19 @@ class Schedule:
         self._classNumb = 0
         self._isFitnessChanged = True
 
-    # Returns the list of classes(as in lectures) for the schedule
     def get_classes(self):
         self._isFitnessChanged = True
         return self._classes
 
-    # Returns the list of conflicts for the schedule
     def get_conflicts(self):
         return self._conflicts
 
-    # Returns the fitness of the schedule
     def get_fitness(self):
         if self._isFitnessChanged:
             self._fitness = self.calculate_fitness()
             self._isFitnessChanged = False
         return self._fitness
 
-    # Initializes the schedule
     def initialize(self):
         depts = self._data.get_depts()
         for dept in depts:
@@ -168,13 +173,13 @@ class Schedule:
                     instructors = course.get_instructors()
                     newClass.set_instructor(instructors[rnd.randrange(0, len(instructors))])
                     self._classes.append(newClass)
-                    course.set_class1(newClass)
+                    course.c1 = newClass
 
                 if course.get_credit_hours() == 2:
                     class1 = Class(self._classNumb, dept, course)
                     self._classNumb += 1
                     index = rnd.randrange(0, len(dbMgr.get_meetingTimes())-1)
-                    if meeting_times[index].get_sub() != meeting_times[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+                    if meeting_times[index].get_sub() != meeting_times[index + 1].get_sub(): index -= 1
                     class1.set_meetingTime(dbMgr.get_meetingTimes()[index])
                     room = rnd.randrange(0, len(dbMgr.get_rooms()))
                     class1.set_room(dbMgr.get_rooms()[room])
@@ -190,11 +195,11 @@ class Schedule:
                     class2.set_instructor(instructors[rnd.randrange(0, len(instructors))])
                     self._classes.append(class2)
 
-                    course.set_class1(class1)
-                    course.set_class2(class2)
+                    course.c1 = class1
+                    course.c2 = class2
 
                 if course.get_credit_hours() == 3:
-                    
+
                     class1 = Class(self._classNumb, dept, course)
                     self._classNumb += 1
                     index = rnd.randrange(0, len(dbMgr.get_meetingTimes())-1)
@@ -224,60 +229,33 @@ class Schedule:
                     instructors = course.get_instructors()
                     class3.set_instructor(instructors[rnd.randrange(0, len(instructors))])
                     self._classes.append(class3)
-                    
-                    course.set_class1(class1)
-                    course.set_class2(class2)
-                    course.set_class3(class3)
+
+                    course.c1 = class1
+                    course.c2 = class2
+                    course.c3 = class3
         return self
 
-    # Calculates the fitness of the schedule
     def calculate_fitness(self):
         self._conflicts = []
         classes = self.get_classes()
+        # credit_hours_count = {1: 0, 2: 0, 3: 0}
         for i in range(0, len(classes)):
-            # Seating Capacity Constraint
             seatingCapacityConflict = list()
             seatingCapacityConflict.append(classes[i])
             if (classes[i].get_room().get_seatingCapacity() < classes[i].get_course().get_maxNumbOfStudents()):
                 self._conflicts.append(Conflict(Conflict.ConflictType.NUMB_OF_STUDENTS, seatingCapacityConflict))
-
-            # # Credit Hour Constraint
-            # creditHourConflict = list()
-            # creditHourConflict.append(classes[i])
-            # course = classes[i].get_course()
-            # unit = course.get_credit_hours()
-            # if unit > 1:
-            #     period1 = int(course.get_class1().get_meetingTime().get_id()[2:])
-            #     period2 = int(course.get_class2().get_meetingTime().get_id()[2:])
-            #     if(period2 != period1 + 1):
-            #         print(period1, period2)
-            #     if period2 != (period1 + 1):
-            #         self._conflicts.append(Conflict(Conflict.ConflictType.CREDIT_HOURS, creditHourConflict))
-            #         print('hhhhhhh')
-
-            # Here I removed the instructor availability since all lectures are available through the week except for chapel days (Tue / Thur)
-            # I need to create a new table for dept-instructor so that you can assign instructors to specific departments to make the availability work
             # if (classes[i].get_meetingTime() not in classes[i].get_instructor().get_availability()):
             #     conflictBetweenClasses = list()
             #     conflictBetweenClasses.append(classes[i])
             #     self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_AVAILABILITY, conflictBetweenClasses))
-        
 
-        # Here lies the code for the other conflicts. sort them out later
-
-            # for index_j, j in enumerate(classes):
-            #     if (index_j >= index_j):  # corrected line
-            #         if (i.get_meetingTime() == j.get_meetingTime() and i.get_id() != j.get_id()):
-            #             if (i.get_room() == j.get_room()):
-            #                 roomBookingConflict = list()
-            #                 roomBookingConflict.append(i)
-            #                 roomBookingConflict.append(j)
-            #                 self._conflicts.append(Conflict(Conflict.ConflictType.ROOM_BOOKING, roomBookingConflict))
-            #             if (i.get_instructor() == j.get_instructor()):
-            #                 instructorBookingConflict = list()
-            #                 instructorBookingConflict.append(i)
-            #                 instructorBookingConflict.append(j)
-            #                 self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
+        # # need to find fix for credit hours constraint
+        # for i in classes:
+        #     if i.course.creditHours == 2 or i.course.creditHours == 3:
+        #         if int(i.course.c2.meetingTime.id[2:]) != (int(i.course.c1.meetingTime.id[2:]) + 1):
+        #             creditHoursConflict = []
+        #             creditHoursConflict.append(classes[i])
+        #             self._conflicts.append(Conflict(Conflict.ConflictType.CREDIT_HOURS, creditHoursConflict))
 
             for j in range(0, len(classes)):
                 if (j >= i):
@@ -293,21 +271,15 @@ class Schedule:
                             instructorBookingConflict.append(classes[i])
                             instructorBookingConflict.append(classes[j])
                             self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
-
-
-        # I need to work on the fitness function so it assigns weights to the conflicts.
-        # The weights would be the multiplicative factor
-        # For multiple weights add them in the denominator
-        # The plus one makes it such that when the number of conflicts is zero the total fitness would be one
         return 1 / ((1.0 * len(self._conflicts) + 1))
-    
+
     def __str__(self):
         returnValue = ""
         for i in range(0, len(self._classes) - 1):
             returnValue += str(self._classes[i]) + ", "
         returnValue += str(self._classes[len(self._classes)-1])
         return returnValue
-    
+
 class Population:
     def __init__(self, size):
         self._size = size
@@ -336,7 +308,7 @@ class GeneticAlgorithm:
         for i in range(NUMB_OF_ELITE_SCHEDULES, POPULATION_SIZE):
             self._mutate_schedule(population.get_schedules()[i])
         return population
-    
+
     def _crossover_schedule(self, schedule1, schedule2):
         crossoverSchedule = Schedule().initialize()
         for i in range(0, len(crossoverSchedule.get_classes())):
@@ -344,7 +316,7 @@ class GeneticAlgorithm:
                 crossoverSchedule.get_classes()[i] = schedule1.get_classes()[i]
             else:
                 crossoverSchedule.get_classes()[i] = schedule2.get_classes()[i]
-    
+
         # # Ensure the crossover schedule adheres to the credit hours constraint
         # total_credit_hours = sum(class_.get_course().get_credit_hours() for class_ in crossoverSchedule.get_classes())
         # while total_credit_hours != crossoverSchedule._data.get_numberOfClasses():
@@ -353,38 +325,40 @@ class GeneticAlgorithm:
 
         # stopper = True
         # block = []
-        # while stopper:
+        # while stopper == True:
         #     for i in crossoverSchedule.get_classes():
-        #         if i.get_course().get_credit_hours() == 2 or i.get_course().get_credit_hours() == 3:
-        #             if int(i.get_course().get_class1().get_meetingTime().get_id()[2:]) != (int(i.get_course().get_class2().get_meetingTime().get_id()[2:]) + 1):
+        #         if i.course.creditHours == 2 or i.course.creditHours == 3:
+        #             if int(i.course.c2.meetingTime.id[2:]) != (int(i.course.c1.meetingTime.id[2:]) + 1):
         #                 block.append(False)
         #                 crossoverSchedule = Schedule().initialize()
         #                 break
         #             else:
-        #                 block.append(True)
-        #     if False not in block:
-        #         stopper = False
+        #                 if False not in block:
+        #                     stopper = False
+        #                     break
+
 
         return crossoverSchedule
 
     # def _mutate_schedule(self, mutateSchedule):
-        stopper = True
-        block = []
-        while stopper:
-            schedule = Schedule().initialize()
-            for i in range(0, len(mutateSchedule.get_classes())):
-                if MUTATION_RATE > rnd.random():
-                    mutated_class = schedule.get_classes()[i]
-                    if mutated_class.get_course().get_credit_hours() == 2 or mutated_class.get_course().get_credit_hours() == 3:
-                        if int(mutated_class.get_course().get_class1().get_meetingTime().get_id[2:]) != (int(mutated_class.get_course().get_class2().get_meetingTime().get_id[2:]) + 1):
-                            block.append(False)
-                            mutateSchedule = Schedule().initialize()
-                            break
-                        else:
-                            block.append(True)
-            if False not in block:
-                stopper = False
-        return mutateSchedule
+    #     stopper = True
+    #     while stopper == True:
+    #         block = []
+    #         schedule = Schedule().initialize()
+    #         for i in range(0, len(mutateSchedule.get_classes())):
+    #             if MUTATION_RATE > rnd.random():
+    #                 mutated_class = schedule.get_classes()[i]
+    #                 if mutated_class.course.creditHours == 2 or mutated_class.course.creditHours == 3:
+    #                     if int(mutated_class.course.c2.meetingTime.id[2:]) != (int(mutated_class.course.c1.meetingTime.id[2:]) + 1):
+    #                         block.append(False)
+    #                         mutateSchedule = Schedule().initialize()
+    #                         break
+    #                     else:
+    #                         if False not in block:
+    #                             stopper = False
+    #                             mutateSchedule.get_classes()[i] = mutated_class
+    #                             break
+    #     return mutateSchedule
 
     def _mutate_schedule(self, mutateSchedule):
         schedule = Schedule().initialize()
@@ -415,12 +389,6 @@ class Course:
     def get_instructors(self): return self._instructors
     def get_maxNumbOfStudents(self): return self._maxNumbOfStudents
     def get_credit_hours(self): return self._creditHours
-    def get_class1(self): return self._c1
-    def get_class2(self): return self._c2
-    def get_class3(self): return self._c3
-    def set_class1(self, period): self._c1 = period
-    def set_class2(self, period): self._c2 = period
-    def set_class3(self, period): self._c3 = period
     def __str__(self): return self._name
 class Instructor:
     def __init__(self, id, name, availability):
@@ -658,4 +626,3 @@ def handle_schedule_display(schedule):
         elif (entry == "e"): break
 dbMgr = DBMgr()
 handle_command_line(VERBOSE_FLAG)
-
