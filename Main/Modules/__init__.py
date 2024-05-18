@@ -1,5 +1,5 @@
 # relatively imports from Modules.Db_Manager
-from Modules.Db_Manager import DBMgr
+from .Db_Manager import DBMgr
 import random as rnd
 POPULATION_SIZE = 1000
 
