@@ -1,4 +1,5 @@
-from Modules import dbMgr, rnd, Enum
+from Modules import dbMgr, rnd
+import enum
 
 
 
@@ -117,7 +118,7 @@ class Schedule:
             seatingCapacityConflict = list()
             seatingCapacityConflict.append(classes[i])
             if (classes[i].get_room().get_seatingCapacity() < classes[i].get_course().get_maxNumbOfStudents()):
-                self._conflicts.append(Conflict(Conflict.ConflictType.NUMB_OF_STUDENTS, seatingCapacityConflict))
+                self._conflicts.append(Conflict(ConflictType.NUMB_OF_STUDENTS, seatingCapacityConflict))
 
             # # Credit Hour Constraint
             # creditHourConflict = list()
@@ -165,12 +166,12 @@ class Schedule:
                             roomBookingConflict = list()
                             roomBookingConflict.append(classes[i])
                             roomBookingConflict.append(classes[j])
-                            self._conflicts.append(Conflict(Conflict.ConflictType.ROOM_BOOKING, roomBookingConflict))
+                            self._conflicts.append(Conflict(ConflictType.ROOM_BOOKING, roomBookingConflict))
                         if (classes[i].get_instructor() == classes[j].get_instructor()):
                             instructorBookingConflict = list()
                             instructorBookingConflict.append(classes[i])
                             instructorBookingConflict.append(classes[j])
-                            self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
+                            self._conflicts.append(Conflict(ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
 
 
         # I need to work on the fitness function so it assigns weights to the conflicts.
@@ -208,14 +209,14 @@ class Class:
         return str(self._dept.get_name()) + "," + str(self._course.get_number()) + "," + \
                str(self._room.get_number()) + "," + str(self._instructor.get_id()) + "," + str(self._meetingTime.get_id())
 
-class Conflict:
-    
-    class ConflictType(Enum):
+class ConflictType(enum.Enum):
         INSTRUCTOR_BOOKING = 1
         ROOM_BOOKING = 2
         NUMB_OF_STUDENTS = 3
         INSTRUCTOR_AVAILABILITY = 4
         CREDIT_HOURS = 5  # New conflict type for credit hours constraint
+
+class Conflict:
 
     def __init__(self, conflictType, conflictBetweenClasses):
         self._conflictType = conflictType
