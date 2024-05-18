@@ -120,16 +120,16 @@ class Schedule:
             if (classes[i].get_room().get_seatingCapacity() < classes[i].get_course().get_maxNumbOfStudents()):
                 self._conflicts.append(Conflict(ConflictType.NUMB_OF_STUDENTS, seatingCapacityConflict))
 
-            # # Credit Hour Constraint
-            # creditHourConflict = list()
-            # creditHourConflict.append(classes[i])
-            # course = classes[i].get_course()
-            # unit = course.get_credit_hours()
-            # if unit > 1:
-            #     period1 = int(course.get_class1().get_meetingTime().get_id()[2:])
-            #     period2 = int(course.get_class2().get_meetingTime().get_id()[2:])
-            #     if(period2 != period1 + 1):
-            #         print(period1, period2)
+            # Credit Hour Constraint
+            creditHourConflict = list()
+            creditHourConflict.append(classes[i])
+            course = classes[i].get_course()
+            unit = course.get_credit_hours()
+            if unit > 1:
+                period1 = int(course.get_class1().get_meetingTime().get_id()[2:])
+                period2 = int(course.get_class2().get_meetingTime().get_id()[2:])
+                if(period2 != period1 + 1):
+                    print(period1, period2)
             #     if period2 != (period1 + 1):
             #         self._conflicts.append(Conflict(Conflict.ConflictType.CREDIT_HOURS, creditHourConflict))
             #         print('hhhhhhh')
@@ -141,22 +141,6 @@ class Schedule:
             #     conflictBetweenClasses.append(classes[i])
             #     self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_AVAILABILITY, conflictBetweenClasses))
         
-
-        # Here lies the code for the other conflicts. sort them out later
-
-            # for index_j, j in enumerate(classes):
-            #     if (index_j >= index_j):  # corrected line
-            #         if (i.get_meetingTime() == j.get_meetingTime() and i.get_id() != j.get_id()):
-            #             if (i.get_room() == j.get_room()):
-            #                 roomBookingConflict = list()
-            #                 roomBookingConflict.append(i)
-            #                 roomBookingConflict.append(j)
-            #                 self._conflicts.append(Conflict(Conflict.ConflictType.ROOM_BOOKING, roomBookingConflict))
-            #             if (i.get_instructor() == j.get_instructor()):
-            #                 instructorBookingConflict = list()
-            #                 instructorBookingConflict.append(i)
-            #                 instructorBookingConflict.append(j)
-            #                 self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
 
             for j in range(0, len(classes)):
                 if (j >= i):
