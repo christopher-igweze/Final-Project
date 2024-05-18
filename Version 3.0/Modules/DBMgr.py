@@ -1,6 +1,8 @@
+# importing necessary libraries and packages
 import sqlite3 as sqlite
 import os
 
+# used this to store the path of the database file
 db_path = os.path.join(os.path.dirname(__file__), '..', 'class_schedule-01.db')
 
 # Class to manage the database and all the data retrieval
@@ -115,7 +117,7 @@ class DBMgr:
     def get_numberOfClasses(self): return self._numberOfClasses
 
 
-
+# Class to store details of each course from the database and it's placement in the timetable 
 class Course:
     def __init__(self, number, name, instructors, maxNumbOfStudents, creditHours, class1=None, class2=None, class3=None):
         self._number = number
@@ -138,6 +140,8 @@ class Course:
     def set_class2(self, period): self._c2 = period
     def set_class3(self, period): self._c3 = period
     def __str__(self): return self._name
+
+# Class to store details of each instructor from the database
 class Instructor:
     def __init__(self, id, name, availability):
         self._id = id
@@ -147,12 +151,16 @@ class Instructor:
     def get_name(self): return self._name
     def get_availability(self): return self._availability
     def __str__(self): return self._name
+
+# Class to store details of each room from the database
 class Room:
     def __init__(self, number, seatingCapacity):
         self._number = number
         self._seatingCapacity = seatingCapacity
     def get_number(self): return self._number
     def get_seatingCapacity(self): return self._seatingCapacity
+
+# Class to store details of each meeting time from the database
 class MeetingTime:
     def __init__(self, id, time, sub):
         self._id = id
@@ -161,6 +169,8 @@ class MeetingTime:
     def get_id(self): return self._id
     def get_time(self): return self._time
     def get_sub(self): return self._sub
+
+# Class to store details of each department from the database
 class Department:
     def __init__(self, name, courses):
         self._name = name
@@ -169,5 +179,3 @@ class Department:
     def get_courses(self): return self._courses
     def __str__(self): return self._name
 
-
-# Path: Version%203.0/Modules/Display.py
