@@ -1,6 +1,5 @@
-import random as rnd
-from Db_Manager import dbMgr
-from Elements import Class, Conflict
+from Modules import dbMgr, rnd
+from Modules.Elements import Class, Conflict
 
 # Class to manage the scheduling process
 class Schedule:

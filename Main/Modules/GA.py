@@ -1,8 +1,7 @@
-from Population import Population
-from Schedule import Schedule
-import random as rnd
+from Modules.Population import Population
+from Modules.Schedule import Schedule
+from Modules import POPULATION_SIZE, rnd
 
-POPULATION_SIZE = 1000
 NUMB_OF_ELITE_SCHEDULES = 1
 TOURNAMENT_SELECTION_SIZE = 3
 MUTATION_RATE = 0.1

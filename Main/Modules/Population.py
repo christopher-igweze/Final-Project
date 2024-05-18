@@ -1,5 +1,5 @@
-from Db_Manager import dbMgr
-from Schedule import Schedule
+from Modules import dbMgr
+from Modules.Schedule import Schedule
 
 # A class that represents a population of schedules
 class Population:

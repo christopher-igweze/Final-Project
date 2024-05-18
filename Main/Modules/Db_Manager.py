@@ -1,6 +1,6 @@
 # Importing necessary libraries
 import sqlite3 as sqlite
-from Elements import Room, MeetingTime, Instructor, Course, Department
+from Modules.Elements import Room, MeetingTime, Instructor, Course, Department
 
 # Class to manage the database and all the data retrieval
 class DBMgr:
@@ -8,7 +8,7 @@ class DBMgr:
     # Constructor for the class
     # need to add more the new tables
     def __init__(self):
-        self._conn = sqlite.connect('database.db')
+        self._conn = sqlite.connect('../database.db')
         self._c = self._conn.cursor()
         self._rooms = self._select_rooms()
         self._meetingTimes = self._select_meeting_times()
