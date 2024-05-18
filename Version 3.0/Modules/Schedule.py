@@ -180,6 +180,7 @@ class Schedule:
         # The plus one makes it such that when the number of conflicts is zero the total fitness would be one
         return 1 / ((1.0 * len(self._conflicts) + 1))
     
+    # String representation of the schedule
     def __str__(self):
         returnValue = ""
         for i in range(0, len(self._classes) - 1):
