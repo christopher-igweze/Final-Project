@@ -68,25 +68,6 @@ class GeneticAlgorithm:
 
         return crossoverSchedule
 
-    # def _mutate_schedule(self, mutateSchedule):
-    #     stopper = True
-    #     block = []
-    #     while stopper:
-    #         schedule = Schedule().initialize()
-    #         for i in range(0, len(mutateSchedule.get_classes())):
-    #             if MUTATION_RATE > rnd.random():
-    #                 mutated_class = schedule.get_classes()[i]
-    #                 if mutated_class.get_course().get_credit_hours() == 2 or mutated_class.get_course().get_credit_hours() == 3:
-    #                     if int(mutated_class.get_course().get_class1().get_meetingTime().get_id[2:]) != (int(mutated_class.get_course().get_class2().get_meetingTime().get_id[2:]) + 1):
-    #                         block.append(False)
-    #                         mutateSchedule = Schedule().initialize()
-    #                         break
-    #                     else:
-    #                         block.append(True)
-    #         if False not in block:
-    #             stopper = False
-    #     return mutateSchedule
-
     # Perform mutation on a schedule
     def _mutate_schedule(self, mutateSchedule):
         # Initialize a new schedule
