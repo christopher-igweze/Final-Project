@@ -114,6 +114,8 @@ class Schedule:
         self._conflicts = []
         classes = self.get_classes()
         for i in range(0, len(classes)):
+
+            # I need to create a constraint for consecutive instructor and room booking for two unit and three unit courses (maybe should be a soft constraint)
             # Seating Capacity Constraint
             seatingCapacityConflict = list()
             seatingCapacityConflict.append(classes[i])
@@ -129,10 +131,11 @@ class Schedule:
                 period1 = int(course.get_class1().get_meetingTime().get_id()[2:])
                 period2 = int(course.get_class2().get_meetingTime().get_id()[2:])
                 if(period2 != period1 + 1):
-                    print(period1, period2)
-            #     if period2 != (period1 + 1):
-            #         self._conflicts.append(Conflict(Conflict.ConflictType.CREDIT_HOURS, creditHourConflict))
-            #         print('hhhhhhh')
+                    print(f"Period 1: {period1}, type: {type(period1)}")
+                    print(f"Period 2: {period2}, type: {type(period2)}")
+                # if period2 != (period1 + 1):
+                #     self._conflicts.append(Conflict(Conflict.ConflictType.CREDIT_HOURS, creditHourConflict))
+                #     print('hhhhhhh')
 
             # Here I removed the instructor availability since all lectures are available through the week except for chapel days (Tue / Thur)
             # I need to create a new table for dept-instructor so that you can assign instructors to specific departments to make the availability work
