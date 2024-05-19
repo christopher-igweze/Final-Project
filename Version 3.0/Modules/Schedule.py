@@ -35,6 +35,7 @@ class Schedule:
     # Initializes the schedule
     def initialize(self):
         # Create a list of big rooms and small rooms to speed up the room assignment process
+        # I'll eventually have to do for lab courses
         bigRoom = []
         smallRoom = []
         for i in range(0, len(dbMgr.get_rooms())):
@@ -153,12 +154,8 @@ class Schedule:
             if unit > 1:
                 period1 = int(course.get_class1().get_meetingTime().get_id()[2:])
                 period2 = int(course.get_class2().get_meetingTime().get_id()[2:])
-                if(period2 != period1 + 1):
-                    print(f"Period 1: {period1}, type: {type(period1)}")
-                    print(f"Period 2: {period2}, type: {type(period2)}")
-                # if period2 != (period1 + 1):
-                #     self._conflicts.append(Conflict(Conflict.ConflictType.CREDIT_HOURS, creditHourConflict))
-                #     print('hhhhhhh')
+                if period2 != (period1 + 1):
+                    self._conflicts.append(Conflict(Conflict.ConflictType.CREDIT_HOURS, creditHourConflict))
 
             # Here I removed the instructor availability since all lectures are available through the week except for chapel days (Tue / Thur)
             # I need to create a new table for dept-instructor so that you can assign instructors to specific departments to make the availability work
