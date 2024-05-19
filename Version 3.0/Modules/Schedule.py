@@ -44,7 +44,11 @@ class Schedule:
             else:
                 smallRoom.append(dbMgr.get_rooms()[i])
 
-        
+        # Chapel days constraint meeting times
+        tuesdayService_meetingTimes = [meetingTime for meetingTime in dbMgr.get_meetingTimes() if meetingTime not in dbMgr.get_meetingTimes()[10:12]]
+        thursdayService_meetingTimes = [meetingTime for meetingTime in dbMgr.get_meetingTimes() if meetingTime not in dbMgr.get_meetingTimes()[30:32]]
+        course_colleges = {i[0]: i[1] for i in dbMgr.get_courseColleges()}
+
         depts = self._data.get_depts()
         for dept in depts:
             courses = dept.get_courses()
@@ -54,7 +58,13 @@ class Schedule:
                 if course.get_credit_hours() == 1:
                     newClass = Class(self._classNumb, dept, course)
                     self._classNumb += 1
-                    newClass.set_meetingTime(dbMgr.get_meetingTimes()[rnd.randrange(0, len(dbMgr.get_meetingTimes()))])
+                    # Here I will check for their service days and set a meeting time appropriately
+                    college = course_colleges.get(course.get_number())
+                    
+                    if college == 'CST' or college == 'CMSS':
+                        newClass.set_meetingTime(rnd.choice(thursdayService_meetingTimes))
+                    else:
+                        newClass.set_meetingTime(rnd.choice(tuesdayService_meetingTimes))
                     # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
                     if course.get_maxNumbOfStudents() > 300:
                         newClass.set_room(bigRoom[rnd.randrange(0, len(bigRoom))])
@@ -68,9 +78,17 @@ class Schedule:
                 if course.get_credit_hours() == 2:
                     class1 = Class(self._classNumb, dept, course)
                     self._classNumb += 1
-                    index = rnd.randrange(0, len(dbMgr.get_meetingTimes())-1)
-                    if meeting_times[index].get_sub() != meeting_times[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
-                    class1.set_meetingTime(dbMgr.get_meetingTimes()[index])
+                    # Here I will check for their service days and set a meeting time appropriately
+                    college = course_colleges.get(course.get_number())
+                    
+                    if college == 'CST' or college == 'CMSS':
+                        index = rnd.randrange(0, len(thursdayService_meetingTimes)-1)
+                        if thursdayService_meetingTimes[index].get_sub() != thursdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+                        class1.set_meetingTime(thursdayService_meetingTimes[index])
+                    else:
+                        index = rnd.randrange(0, len(tuesdayService_meetingTimes)-1)
+                        if tuesdayService_meetingTimes[index].get_sub() != tuesdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+                        class1.set_meetingTime(tuesdayService_meetingTimes[index])
                     # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
                     if course.get_maxNumbOfStudents() > 300:
                         room = bigRoom[rnd.randrange(0, len(bigRoom))]
@@ -83,7 +101,12 @@ class Schedule:
 
                     class2 = Class(self._classNumb, dept, course)
                     self._classNumb += 1
-                    class2.set_meetingTime(dbMgr.get_meetingTimes()[index + 1])
+                    
+                    if college == 'CST' or college == 'CMSS':
+                        class2.set_meetingTime(thursdayService_meetingTimes[index+1])
+                    else:
+                        class2.set_meetingTime(tuesdayService_meetingTimes[index+1])
+                    
                     class2.set_room(room)
                     instructors = course.get_instructors()
                     class2.set_instructor(instructors[rnd.randrange(0, len(instructors))])
@@ -96,9 +119,17 @@ class Schedule:
                     
                     class1 = Class(self._classNumb, dept, course)
                     self._classNumb += 1
-                    index = rnd.randrange(0, len(dbMgr.get_meetingTimes())-1)
-                    if meeting_times[index].get_sub() != meeting_times[index + 1].get_sub(): index -= 1
-                    class1.set_meetingTime(dbMgr.get_meetingTimes()[index])
+                    # Here I will check for their service days and set a meeting time appropriately
+                    college = course_colleges.get(course.get_number())
+                    
+                    if college == 'CST' or college == 'CMSS':
+                        index = rnd.randrange(0, len(thursdayService_meetingTimes)-1)
+                        if thursdayService_meetingTimes[index].get_sub() != thursdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+                        class1.set_meetingTime(thursdayService_meetingTimes[index])
+                    else:
+                        index = rnd.randrange(0, len(tuesdayService_meetingTimes)-1)
+                        if tuesdayService_meetingTimes[index].get_sub() != tuesdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+                        class1.set_meetingTime(tuesdayService_meetingTimes[index])
                     # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
                     if course.get_maxNumbOfStudents() > 300:
                         room = bigRoom[rnd.randrange(0, len(bigRoom))]
@@ -111,7 +142,10 @@ class Schedule:
 
                     class2 = Class(self._classNumb, dept, course)
                     self._classNumb += 1
-                    class2.set_meetingTime(dbMgr.get_meetingTimes()[index + 1])
+                    if college == 'CST' or college == 'CMSS':
+                        class2.set_meetingTime(thursdayService_meetingTimes[index+1])
+                    else:
+                        class2.set_meetingTime(tuesdayService_meetingTimes[index+1])
                     class2.set_room(room)
                     instructors = course.get_instructors()
                     class2.set_instructor(instructors[rnd.randrange(0, len(instructors))])
@@ -120,9 +154,10 @@ class Schedule:
                     class3 = Class(self._classNumb, dept, course)
                     self._classNumb += 1
                     while True:
+                        meeting_times = thursdayService_meetingTimes if college in ['CST', 'CMSS'] else tuesdayService_meetingTimes
                         class3.set_meetingTime(rnd.choice(meeting_times))
                         if class3.get_meetingTime().get_sub() != class1.get_meetingTime().get_sub():
-                            break
+                            break 
                     class3.set_room(dbMgr.get_rooms()[rnd.randrange(0, len(dbMgr.get_rooms()))])
                     instructors = course.get_instructors()
                     class3.set_instructor(instructors[rnd.randrange(0, len(instructors))])
@@ -147,6 +182,7 @@ class Schedule:
                 self._conflicts.append(Conflict(ConflictType.NUMB_OF_STUDENTS, seatingCapacityConflict))
 
             # Credit Hour Constraint
+            # Isn't actually working. Come back to it.
             creditHourConflict = list()
             creditHourConflict.append(classes[i])
             course = classes[i].get_course()

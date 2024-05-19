@@ -18,6 +18,7 @@ class DBMgr:
         self._instructors = self._select_instructors()
         self._courses = self._select_courses()
         self._depts = self._select_depts()
+        self._colleges = self._select_colleges() # to store the colleges of each course
         self._numberOfClasses = 0
         for i in range(0, len(self._depts)):
             self._numberOfClasses += len(self._depts[i].get_courses())
@@ -61,6 +62,21 @@ class DBMgr:
             if self._meetingTimes[i].get_id() in instructorMTs:
                 instructorAvailability.append(self._meetingTimes[i])
         return instructorAvailability
+    
+    # retrieve the colleges certain courses belong to
+    def _select_colleges(self):
+        self._c.execute("""
+                SELECT course.number, dept.college 
+                FROM course 
+                JOIN course_instructor ON course.number == course_instructor.course_number 
+                JOIN instructor ON course_instructor.instructor_number == instructor.number 
+                JOIN dept ON instructor.Dept_id == dept.id
+            """)
+        colleges = self._c.fetchall()
+        returnColleges = []
+        for i in range(0, len(colleges)):
+            returnColleges.append([colleges[i][0], colleges[i][1]])
+        return returnColleges
     
     # Returns the list of courses. [id, name, instructors, max number of students, credit hours], 
     # max number of students and the credits hours
@@ -115,6 +131,7 @@ class DBMgr:
     def get_depts(self): return self._depts
     def get_meetingTimes(self): return self._meetingTimes
     def get_numberOfClasses(self): return self._numberOfClasses
+    def get_courseColleges(self): return self._colleges
 
 
 # Class to store details of each course from the database and it's placement in the timetable 
