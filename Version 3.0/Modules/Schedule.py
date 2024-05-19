@@ -1,3 +1,4 @@
+from cgitb import small
 from Modules import dbMgr, rnd
 import enum
 
@@ -33,6 +34,16 @@ class Schedule:
 
     # Initializes the schedule
     def initialize(self):
+        # Create a list of big rooms and small rooms to speed up the room assignment process
+        bigRoom = []
+        smallRoom = []
+        for i in range(0, len(dbMgr.get_rooms())):
+            if dbMgr.get_rooms()[i].get_seatingCapacity() > 300:
+                bigRoom.append(dbMgr.get_rooms()[i])
+            else:
+                smallRoom.append(dbMgr.get_rooms()[i])
+
+        
         depts = self._data.get_depts()
         for dept in depts:
             courses = dept.get_courses()
@@ -43,7 +54,11 @@ class Schedule:
                     newClass = Class(self._classNumb, dept, course)
                     self._classNumb += 1
                     newClass.set_meetingTime(dbMgr.get_meetingTimes()[rnd.randrange(0, len(dbMgr.get_meetingTimes()))])
-                    newClass.set_room(dbMgr.get_rooms()[rnd.randrange(0, len(dbMgr.get_rooms()))])
+                    # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
+                    if course.get_maxNumbOfStudents() > 300:
+                        newClass.set_room(bigRoom[rnd.randrange(0, len(bigRoom))])
+                    else:
+                        newClass.set_room(smallRoom[rnd.randrange(0, len(smallRoom))])
                     instructors = course.get_instructors()
                     newClass.set_instructor(instructors[rnd.randrange(0, len(instructors))])
                     self._classes.append(newClass)
@@ -55,8 +70,12 @@ class Schedule:
                     index = rnd.randrange(0, len(dbMgr.get_meetingTimes())-1)
                     if meeting_times[index].get_sub() != meeting_times[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
                     class1.set_meetingTime(dbMgr.get_meetingTimes()[index])
-                    room = rnd.randrange(0, len(dbMgr.get_rooms()))
-                    class1.set_room(dbMgr.get_rooms()[room])
+                    # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
+                    if course.get_maxNumbOfStudents() > 300:
+                        room = bigRoom[rnd.randrange(0, len(bigRoom))]
+                    else:
+                        room = smallRoom[rnd.randrange(0, len(smallRoom))]
+                    class1.set_room(room)
                     instructors = course.get_instructors()
                     class1.set_instructor(instructors[rnd.randrange(0, len(instructors))])
                     self._classes.append(class1)
@@ -64,7 +83,7 @@ class Schedule:
                     class2 = Class(self._classNumb, dept, course)
                     self._classNumb += 1
                     class2.set_meetingTime(dbMgr.get_meetingTimes()[index + 1])
-                    class2.set_room(dbMgr.get_rooms()[room])
+                    class2.set_room(room)
                     instructors = course.get_instructors()
                     class2.set_instructor(instructors[rnd.randrange(0, len(instructors))])
                     self._classes.append(class2)
@@ -79,8 +98,12 @@ class Schedule:
                     index = rnd.randrange(0, len(dbMgr.get_meetingTimes())-1)
                     if meeting_times[index].get_sub() != meeting_times[index + 1].get_sub(): index -= 1
                     class1.set_meetingTime(dbMgr.get_meetingTimes()[index])
-                    room = rnd.randrange(0, len(dbMgr.get_rooms()))
-                    class1.set_room(dbMgr.get_rooms()[room])
+                    # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
+                    if course.get_maxNumbOfStudents() > 300:
+                        room = bigRoom[rnd.randrange(0, len(bigRoom))]
+                    else:
+                        room = smallRoom[rnd.randrange(0, len(smallRoom))]
+                    class1.set_room(room)
                     instructors = course.get_instructors()
                     class1.set_instructor(instructors[rnd.randrange(0, len(instructors))])
                     self._classes.append(class1)
@@ -88,7 +111,7 @@ class Schedule:
                     class2 = Class(self._classNumb, dept, course)
                     self._classNumb += 1
                     class2.set_meetingTime(dbMgr.get_meetingTimes()[index + 1])
-                    class2.set_room(dbMgr.get_rooms()[room])
+                    class2.set_room(room)
                     instructors = course.get_instructors()
                     class2.set_instructor(instructors[rnd.randrange(0, len(instructors))])
                     self._classes.append(class2)
