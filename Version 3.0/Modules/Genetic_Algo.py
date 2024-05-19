@@ -45,27 +45,6 @@ class GeneticAlgorithm:
                 crossoverSchedule.get_classes()[i] = schedule1.get_classes()[i]
             else:
                 crossoverSchedule.get_classes()[i] = schedule2.get_classes()[i]
-    
-        # # Ensure the crossover schedule adheres to the credit hours constraint
-        # total_credit_hours = sum(class_.get_course().get_credit_hours() for class_ in crossoverSchedule.get_classes())
-        # while total_credit_hours != crossoverSchedule._data.get_numberOfClasses():
-        #     crossoverSchedule = Schedule().initialize()
-        #     total_credit_hours = sum(class_.get_course().get_credit_hours() for class_ in crossoverSchedule.get_classes())
-
-        # stopper = True
-        # block = []
-        # while stopper:
-        #     for i in crossoverSchedule.get_classes():
-        #         if i.get_course().get_credit_hours() == 2 or i.get_course().get_credit_hours() == 3:
-        #             if int(i.get_course().get_class1().get_meetingTime().get_id()[2:]) != (int(i.get_course().get_class2().get_meetingTime().get_id()[2:]) + 1):
-        #                 block.append(False)
-        #                 crossoverSchedule = Schedule().initialize()
-        #                 break
-        #             else:
-        #                 block.append(True)
-        #     if False not in block:
-        #         stopper = False
-
         return crossoverSchedule
 
     # Perform mutation on a schedule
