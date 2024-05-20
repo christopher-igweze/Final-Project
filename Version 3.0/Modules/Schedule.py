@@ -1,4 +1,3 @@
-from cgitb import small
 from Modules import dbMgr, rnd
 import enum
 
@@ -210,7 +209,11 @@ class Schedule:
                             roomBookingConflict.append(classes[i])
                             roomBookingConflict.append(classes[j])
                             self._conflicts.append(Conflict(ConflictType.ROOM_BOOKING, roomBookingConflict))
-                        if (classes[i].get_instructor() == classes[j].get_instructor()):
+                        # This line checks if there are any common instructors between two classes.
+                        # It does this by creating sets of instructors for each class and finding the intersection of these sets.
+                        # If the intersection is not empty (i.e., there are common instructors), the condition is True.
+                        # This could indicate a scheduling conflict, as an instructor cannot teach two classes at the same time.
+                        if set(classes[i].get_instructors()) & set(classes[j].get_instructors()):
                             instructorBookingConflict = list()
                             instructorBookingConflict.append(classes[i])
                             instructorBookingConflict.append(classes[j])
