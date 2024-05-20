@@ -1,7 +1,6 @@
 from Modules import dbMgr, rnd
+from Modules.DBMgr import Instructor, MeetingTime
 import enum
-
-
 
 # Class to manage the scheduling process
 class Schedule:
@@ -57,7 +56,7 @@ class Schedule:
                 # my attempt at ensuring that the credit hours constraint is met
                 meeting_times = dbMgr.get_meetingTimes()
                 if course.get_credit_hours() == 1:
-                    newClass = Class(self._classNumb, dept, course)
+                    newClass = Lecture(self._classNumb, dept, course)
                     self._classNumb += 1
                     # Here I will check for their service days and set a meeting time appropriately
                     college = course_colleges.get(course.get_number())
@@ -77,7 +76,7 @@ class Schedule:
                     course.set_class1(newClass)
 
                 if course.get_credit_hours() == 2:
-                    class1 = Class(self._classNumb, dept, course)
+                    class1 = Lecture(self._classNumb, dept, course)
                     self._classNumb += 1
                     # Here I will check for their service days and set a meeting time appropriately
                     college = course_colleges.get(course.get_number())
@@ -100,7 +99,7 @@ class Schedule:
                     class1.set_instructor(course.get_instructors())
                     self._classes.append(class1)
 
-                    class2 = Class(self._classNumb, dept, course)
+                    class2 = Lecture(self._classNumb, dept, course)
                     self._classNumb += 1
                     
                     if college == 'CST' or college == 'CMSS':
@@ -118,7 +117,7 @@ class Schedule:
 
                 if course.get_credit_hours() == 3:
                     
-                    class1 = Class(self._classNumb, dept, course)
+                    class1 = Lecture(self._classNumb, dept, course)
                     self._classNumb += 1
                     # Here I will check for their service days and set a meeting time appropriately
                     college = course_colleges.get(course.get_number())
@@ -141,7 +140,7 @@ class Schedule:
                     class1.set_instructor(course.get_instructors())
                     self._classes.append(class1)
 
-                    class2 = Class(self._classNumb, dept, course)
+                    class2 = Lecture(self._classNumb, dept, course)
                     self._classNumb += 1
                     if college == 'CST' or college == 'CMSS':
                         class2.set_meetingTime(thursdayService_meetingTimes[index+1])
@@ -152,7 +151,7 @@ class Schedule:
                     class2.set_instructor(course.get_instructors())
                     self._classes.append(class2)
 
-                    class3 = Class(self._classNumb, dept, course)
+                    class3 = Lecture(self._classNumb, dept, course)
                     self._classNumb += 1
                     while True:
                         meeting_times = thursdayService_meetingTimes if college in ['CST', 'CMSS'] else tuesdayService_meetingTimes
@@ -192,7 +191,7 @@ class Schedule:
                 period1 = int(course.get_class1().get_meetingTime().get_id()[2:])
                 period2 = int(course.get_class2().get_meetingTime().get_id()[2:])
                 if period2 != (period1 + 1):
-                    self._conflicts.append(Conflict(Conflict.ConflictType.CREDIT_HOURS, creditHourConflict))
+                    self._conflicts.append(Conflict(ConflictType.CREDIT_HOURS, creditHourConflict))
 
             # Here I removed the instructor availability since all lectures are available through the week except for chapel days (Tue / Thur)
             # I need to create a new table for dept-instructor so that you can assign instructors to specific departments to make the availability work
@@ -201,10 +200,18 @@ class Schedule:
             conflictBetweenClasses = list()
             conflictBetweenClasses.append(classes[i]) # this   
             if (college in ['CST', 'CMSS']) and (classes[i].get_meetingTime() in dbMgr.get_meetingTimes()[30:32]):
-                self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_AVAILABILITY, conflictBetweenClasses))
+                self._conflicts.append(Conflict(ConflictType.INSTRUCTOR_AVAILABILITY, conflictBetweenClasses))
             elif (college not in ['CST', 'CMSS']) and (classes[i].get_meetingTime() in dbMgr.get_meetingTimes()[10:12]):
-                self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_AVAILABILITY, conflictBetweenClasses))
-        
+                self._conflicts.append(Conflict(ConflictType.INSTRUCTOR_AVAILABILITY, conflictBetweenClasses))
+
+            # Consecutive Room Booking Constraint
+            consecutiveRoomConflict = list()
+            consecutiveRoomConflict.append(classes[i])
+            course = classes[i].get_course()
+            if course.get_credit_hours() > 1:
+                if course.get_class1().get_room() != course.get_class2().get_room():
+                    self._conflicts.append(Conflict(ConflictType.CONSECUTIVE_ROOM_BOOKING, consecutiveRoomConflict))
+                        
 
             for j in range(0, len(classes)):
                 if (j >= i):
@@ -241,14 +248,16 @@ class Schedule:
         return returnValue
  
 
-class Class:
+class Lecture:
     def __init__(self, id, dept, course):
+        # ignore type errors because these are initialised later
+
         self._id = id
         self._dept = dept
         self._course = course
-        self._instructor = None
-        self._meetingTime = None
-        self._room = None
+        self._instructor: list[Instructor] = None # type: ignore
+        self._meetingTime: MeetingTime = None # type: ignore
+        self._room: Room = None # type: ignore
     def get_id(self): return self._id
     def get_dept(self): return self._dept
     def get_course(self): return self._course
@@ -270,6 +279,7 @@ class ConflictType(enum.Enum):
         NUMB_OF_STUDENTS = 3
         INSTRUCTOR_AVAILABILITY = 4
         CREDIT_HOURS = 5
+        CONSECUTIVE_ROOM_BOOKING = 6
 
 class Conflict:
 

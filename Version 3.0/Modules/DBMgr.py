@@ -5,6 +5,69 @@ import os
 # used this to store the path of the database file
 db_path = os.path.join(os.path.dirname(__file__), '..', 'class_schedule-01.db')
 
+# Class to store details of each room from the database
+class Room:
+    def __init__(self, number, seatingCapacity):
+        self._number = number
+        self._seatingCapacity = seatingCapacity
+    def get_number(self): return self._number
+    def get_seatingCapacity(self): return self._seatingCapacity
+
+# Class to store details of each meeting time from the database
+class MeetingTime:
+    def __init__(self, id, time, sub):
+        self._id = id
+        self._time = time
+        self._sub = sub
+    def get_id(self): return self._id
+    def get_time(self): return self._time
+    def get_sub(self): return self._sub
+
+# Class to store details of each instructor from the database
+class Instructor:
+    def __init__(self, id, name, availability):
+        self._id = id
+        self._name = name
+        self._availability = availability
+    def get_id(self): return self._id
+    def get_name(self): return self._name
+    def get_availability(self): return self._availability
+    def __str__(self): return self._name
+
+# Class to store details of each department from the database
+class Department:
+    def __init__(self, name, courses):
+        self._name = name
+        self._courses = courses
+    def get_name(self): return self._name
+    def get_courses(self): return self._courses
+    def __str__(self): return self._name
+
+# Class to store details of each course from the database and it's placement in the timetable 
+class Course:
+    def __init__(self, number, name, instructors, maxNumbOfStudents, creditHours, class1=None, class2=None, class3=None):
+        self._number = number
+        self._name = name
+        self._maxNumbOfStudents = maxNumbOfStudents
+        self._instructors = instructors
+        self._creditHours = creditHours
+        self._c1 = class1
+        self._c2 = class2
+        self._c3 = class3
+    def get_number(self): return self._number
+    def get_name(self): return self._name
+    def get_instructors(self): return self._instructors
+    def get_maxNumbOfStudents(self): return self._maxNumbOfStudents
+    def get_credit_hours(self): return self._creditHours
+    def get_class1(self): return self._c1
+    def get_class2(self): return self._c2
+    def get_class3(self): return self._c3
+    def set_class1(self, period): self._c1 = period
+    def set_class2(self, period): self._c2 = period
+    def set_class3(self, period): self._c3 = period
+    def __str__(self): return self._name
+
+
 # Class to manage the database and all the data retrieval
 class DBMgr:
 
@@ -24,7 +87,7 @@ class DBMgr:
             self._numberOfClasses += len(self._depts[i].get_courses())
 
     # Returns the list of rooms. [room number, room seating capacity]
-    def _select_rooms(self):
+    def _select_rooms(self) -> list[Room]:
         self._c.execute("SELECT * FROM room")
         rooms = self._c.fetchall()
         returnRooms = []
@@ -33,7 +96,7 @@ class DBMgr:
         return returnRooms
     
     # Returns the list of meeting times. [id, meetingtime(day, 1-hour period), subscript(day)]
-    def _select_meeting_times(self):
+    def _select_meeting_times(self) -> list[MeetingTime]:
         self._c.execute("SELECT * FROM meeting_time")
         meetingTimes = self._c.fetchall()
         returnMeetingTimes = []
@@ -43,7 +106,7 @@ class DBMgr:
     
     # Returns the list of instructors. [id, name]
     # The instructor availability is a list of all meeting IDs the instructor is available (I am going to eventually remove the availability)
-    def _select_instructors(self):
+    def _select_instructors(self) -> list[Instructor]:
         self._c.execute("SELECT * FROM instructor")
         instructors = self._c.fetchall()
         returnInstructors = []
@@ -80,7 +143,7 @@ class DBMgr:
     
     # Returns the list of courses. [id, name, instructors, max number of students, credit hours], 
     # max number of students and the credits hours
-    def _select_courses(self):
+    def _select_courses(self) -> list[Course]:
         self._c.execute("SELECT * FROM course")
         courses = self._c.fetchall()
         returnCourses = []
@@ -133,66 +196,4 @@ class DBMgr:
     def get_numberOfClasses(self): return self._numberOfClasses
     def get_courseColleges(self): return self._colleges
 
-
-# Class to store details of each course from the database and it's placement in the timetable 
-class Course:
-    def __init__(self, number, name, instructors, maxNumbOfStudents, creditHours, class1=None, class2=None, class3=None):
-        self._number = number
-        self._name = name
-        self._maxNumbOfStudents = maxNumbOfStudents
-        self._instructors = instructors
-        self._creditHours = creditHours
-        self._c1 = class1
-        self._c2 = class2
-        self._c3 = class3
-    def get_number(self): return self._number
-    def get_name(self): return self._name
-    def get_instructors(self): return self._instructors
-    def get_maxNumbOfStudents(self): return self._maxNumbOfStudents
-    def get_credit_hours(self): return self._creditHours
-    def get_class1(self): return self._c1
-    def get_class2(self): return self._c2
-    def get_class3(self): return self._c3
-    def set_class1(self, period): self._c1 = period
-    def set_class2(self, period): self._c2 = period
-    def set_class3(self, period): self._c3 = period
-    def __str__(self): return self._name
-
-# Class to store details of each instructor from the database
-class Instructor:
-    def __init__(self, id, name, availability):
-        self._id = id
-        self._name = name
-        self._availability = availability
-    def get_id(self): return self._id
-    def get_name(self): return self._name
-    def get_availability(self): return self._availability
-    def __str__(self): return self._name
-
-# Class to store details of each room from the database
-class Room:
-    def __init__(self, number, seatingCapacity):
-        self._number = number
-        self._seatingCapacity = seatingCapacity
-    def get_number(self): return self._number
-    def get_seatingCapacity(self): return self._seatingCapacity
-
-# Class to store details of each meeting time from the database
-class MeetingTime:
-    def __init__(self, id, time, sub):
-        self._id = id
-        self._time = time
-        self._sub = sub
-    def get_id(self): return self._id
-    def get_time(self): return self._time
-    def get_sub(self): return self._sub
-
-# Class to store details of each department from the database
-class Department:
-    def __init__(self, name, courses):
-        self._name = name
-        self._courses = courses
-    def get_name(self): return self._name
-    def get_courses(self): return self._courses
-    def __str__(self): return self._name
 
