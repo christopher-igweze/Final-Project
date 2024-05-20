@@ -44,6 +44,8 @@ class Schedule:
                 smallRoom.append(dbMgr.get_rooms()[i])
 
         # Chapel days constraint meeting times
+        global course_colleges # Making this global so I can use it in the fitness class
+
         tuesdayService_meetingTimes = [meetingTime for meetingTime in dbMgr.get_meetingTimes() if meetingTime not in dbMgr.get_meetingTimes()[10:12]]
         thursdayService_meetingTimes = [meetingTime for meetingTime in dbMgr.get_meetingTimes() if meetingTime not in dbMgr.get_meetingTimes()[30:32]]
         course_colleges = {i[0]: i[1] for i in dbMgr.get_courseColleges()}
@@ -69,8 +71,8 @@ class Schedule:
                         newClass.set_room(bigRoom[rnd.randrange(0, len(bigRoom))])
                     else:
                         newClass.set_room(smallRoom[rnd.randrange(0, len(smallRoom))])
-                    instructors = course.get_instructors()
-                    newClass.set_instructor(instructors[rnd.randrange(0, len(instructors))])
+                    
+                    newClass.set_instructor(course.get_instructors())
                     self._classes.append(newClass)
                     course.set_class1(newClass)
 
@@ -94,8 +96,8 @@ class Schedule:
                     else:
                         room = smallRoom[rnd.randrange(0, len(smallRoom))]
                     class1.set_room(room)
-                    instructors = course.get_instructors()
-                    class1.set_instructor(instructors[rnd.randrange(0, len(instructors))])
+                    
+                    class1.set_instructor(course.get_instructors())
                     self._classes.append(class1)
 
                     class2 = Class(self._classNumb, dept, course)
@@ -107,8 +109,8 @@ class Schedule:
                         class2.set_meetingTime(tuesdayService_meetingTimes[index+1])
                     
                     class2.set_room(room)
-                    instructors = course.get_instructors()
-                    class2.set_instructor(instructors[rnd.randrange(0, len(instructors))])
+                    
+                    class2.set_instructor(course.get_instructors())
                     self._classes.append(class2)
 
                     course.set_class1(class1)
@@ -135,8 +137,8 @@ class Schedule:
                     else:
                         room = smallRoom[rnd.randrange(0, len(smallRoom))]
                     class1.set_room(room)
-                    instructors = course.get_instructors()
-                    class1.set_instructor(instructors[rnd.randrange(0, len(instructors))])
+                    
+                    class1.set_instructor(course.get_instructors())
                     self._classes.append(class1)
 
                     class2 = Class(self._classNumb, dept, course)
@@ -146,8 +148,8 @@ class Schedule:
                     else:
                         class2.set_meetingTime(tuesdayService_meetingTimes[index+1])
                     class2.set_room(room)
-                    instructors = course.get_instructors()
-                    class2.set_instructor(instructors[rnd.randrange(0, len(instructors))])
+                    
+                    class2.set_instructor(course.get_instructors())
                     self._classes.append(class2)
 
                     class3 = Class(self._classNumb, dept, course)
@@ -158,8 +160,8 @@ class Schedule:
                         if class3.get_meetingTime().get_sub() != class1.get_meetingTime().get_sub():
                             break 
                     class3.set_room(dbMgr.get_rooms()[rnd.randrange(0, len(dbMgr.get_rooms()))])
-                    instructors = course.get_instructors()
-                    class3.set_instructor(instructors[rnd.randrange(0, len(instructors))])
+                    
+                    class3.set_instructor(course.get_instructors())
                     self._classes.append(class3)
                     
                     course.set_class1(class1)
@@ -194,10 +196,14 @@ class Schedule:
 
             # Here I removed the instructor availability since all lectures are available through the week except for chapel days (Tue / Thur)
             # I need to create a new table for dept-instructor so that you can assign instructors to specific departments to make the availability work
-            # if (classes[i].get_meetingTime() not in classes[i].get_instructor().get_availability()):
-            #     conflictBetweenClasses = list()
-            #     conflictBetweenClasses.append(classes[i])
-            #     self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_AVAILABILITY, conflictBetweenClasses))
+            # I need to fully understand how (look down for 'this') works
+            college = course_colleges.get(classes[i].get_course().get_number())
+            conflictBetweenClasses = list()
+            conflictBetweenClasses.append(classes[i]) # this   
+            if (college in ['CST', 'CMSS']) and (classes[i].get_meetingTime() in dbMgr.get_meetingTimes()[30:32]):
+                self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_AVAILABILITY, conflictBetweenClasses))
+            elif (college not in ['CST', 'CMSS']) and (classes[i].get_meetingTime() in dbMgr.get_meetingTimes()[10:12]):
+                self._conflicts.append(Conflict(Conflict.ConflictType.INSTRUCTOR_AVAILABILITY, conflictBetweenClasses))
         
 
             for j in range(0, len(classes)):
@@ -213,7 +219,7 @@ class Schedule:
                         # It does this by creating sets of instructors for each class and finding the intersection of these sets.
                         # If the intersection is not empty (i.e., there are common instructors), the condition is True.
                         # This could indicate a scheduling conflict, as an instructor cannot teach two classes at the same time.
-                        if set(classes[i].get_instructors()) & set(classes[j].get_instructors()):
+                        if set(classes[i].get_instructor()) & set(classes[j].get_instructor()):
                             instructorBookingConflict = list()
                             instructorBookingConflict.append(classes[i])
                             instructorBookingConflict.append(classes[j])
@@ -253,15 +259,17 @@ class Class:
     def set_meetingTime(self, meetingTime): self._meetingTime = meetingTime
     def set_room(self, room): self._room = room
     def __str__(self):
+        instructors = [i.get_id() for i in self._instructor]
+        instructors_str = ', '.join(instructors)
         return str(self._dept.get_name()) + "," + str(self._course.get_number()) + "," + \
-               str(self._room.get_number()) + "," + str(self._instructor.get_id()) + "," + str(self._meetingTime.get_id())
+               str(self._room.get_number()) + "," + instructors_str + "," + str(self._meetingTime.get_id())
 
 class ConflictType(enum.Enum):
         INSTRUCTOR_BOOKING = 1
         ROOM_BOOKING = 2
         NUMB_OF_STUDENTS = 3
         INSTRUCTOR_AVAILABILITY = 4
-        CREDIT_HOURS = 5  # New conflict type for credit hours constraint
+        CREDIT_HOURS = 5
 
 class Conflict:
 

@@ -86,12 +86,17 @@ class DisplayMgr:
     def display_schedule_as_table(schedule):
         classes = schedule.get_classes()
         table = prettytable.PrettyTable(['Class #', 'Dept', 'Course (number, max # of students)', 'Room (Capacity)', 'Instructor (Id)',  'Meeting Time (Id)'])
+        
         for i in range(0, len(classes)):
+            instructor_names = [x.get_name() for x in classes[i].get_instructor()]
+            instructor_ids = [x.get_id() for x in classes[i].get_instructor()]
+            instructor_names_str = ', '.join(instructor_names)
+            instructor_ids_str = ', '.join(instructor_ids)
             table.add_row([str(i+1), classes[i].get_dept().get_name(), classes[i].get_course().get_name() + " (" +
                            classes[i].get_course().get_number() + ", " +
                            str(classes[i].get_course().get_maxNumbOfStudents()) +")",
                            classes[i].get_room().get_number() + " (" + str(classes[i].get_room().get_seatingCapacity()) + ")",
-                           classes[i].get_instructor().get_name() +" (" + str(classes[i].get_instructor().get_id()) +")",
+                           instructor_names_str +" (" + instructor_ids_str +")",
                            classes[i].get_meetingTime().get_time() +" (" + str(classes[i].get_meetingTime().get_id()) +")"])
         print(table)
     
