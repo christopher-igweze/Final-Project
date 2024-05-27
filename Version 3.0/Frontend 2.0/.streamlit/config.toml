@@ -1,0 +1,8 @@
+[theme]
+# primaryColor="#792b2b"
+# backgroundColor="#f3ecec"
+# textColor="#0a0909"
+
+[client]
+showSidebarNavigation=false
+toolbarMode="minimal"
