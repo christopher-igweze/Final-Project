@@ -5,6 +5,7 @@ import yaml, os
 import streamlit_authenticator as stauth
 from yaml.loader import SafeLoader
 from utils import load_css, page_config, menu
+import time
 
 page_config()
 load_css()
@@ -33,3 +34,75 @@ elif st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 elif st.session_state["authentication_status"] is None:
     st.switch_page("app.py")
+
+# time the success messages of the other widgets to disappear
+
+# Creating a reset password widget
+if st.session_state["authentication_status"]:
+    try:
+        if authenticator.reset_password(st.session_state["username"], clear_on_submit=True):
+            st.success('Password modified successfully')
+            with open(path, 'w') as file:
+                yaml.dump(config, file, default_flow_style=False)
+    except Exception as e:
+        st.error(e)
+
+
+# Creating a new baby user registration widget
+try:
+    email_of_registered_user, username_of_registered_user, name_of_registered_user = authenticator.register_user(clear_on_submit=True, pre_authorization=False)
+    if email_of_registered_user:
+        st.success('User registered successfully')
+        with open(path, 'w') as file:
+                yaml.dump(config, file, default_flow_style=False)
+except Exception as e:
+    st.error(e)
+
+
+# Creating a forgot password widget
+try:
+    username_of_forgotten_password, email_of_forgotten_password, new_random_password = authenticator.forgot_password(clear_on_submit=True)
+    if username_of_forgotten_password:
+        # st.success('New password to be sent securely')
+        with open(path, 'w') as file:
+                yaml.dump(config, file, default_flow_style=False)
+        # i'll set up an email system later
+        container = st.empty()
+        container.success(f"Here's the new password: {new_random_password}")  # Create a success alert
+        time.sleep(6)  # Wait 2 seconds
+        container.empty()
+        # The developer should securely transfer the new password to the user.
+    elif username_of_forgotten_password == False:
+        st.error('Username not found')
+except Exception as e:
+    st.error(e)
+
+
+
+# Creating a forgot username widget
+try:
+    username_of_forgotten_username, email_of_forgotten_username = authenticator.forgot_username(clear_on_submit=True)
+    if username_of_forgotten_username:
+        # st.success('Username to be sent securely')
+        with open(path, 'w') as file:
+                yaml.dump(config, file, default_flow_style=False)
+        # i'll set up an email system later
+        container = st.empty()
+        container.success(f"Here's your username: {username_of_forgotten_username}")  # Create a success alert
+        time.sleep(6)  # Wait 2 seconds
+        container.empty()
+        # The developer should securely transfer the username to the user.
+    elif username_of_forgotten_username == False:
+        st.error('Email not found')
+except Exception as e:
+    st.error(e)
+
+# Creating an update user details widget
+if st.session_state["authentication_status"]:
+    try:
+        if authenticator.update_user_details(st.session_state["username"], clear_on_submit=True):
+            st.success('Entries updated successfully')
+            with open(path, 'w') as file:
+                yaml.dump(config, file, default_flow_style=False)
+    except Exception as e:
+        st.error(e)

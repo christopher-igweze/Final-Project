@@ -1,0 +1,20 @@
+cookie:
+  expiry_days: 30
+  key: MasterChief
+  name: loginCookie
+credentials:
+  usernames:
+    hboy:
+      email: TimetableOfficer2@covenantuniversity.edu.ng
+      logged_in: false
+      name: Honour Adewunmi
+      password: $2b$12$JYyOJhgH.FrnwOXjX6HnHeSgbd6FnhnxxmozR1Z3BlcDcItbXZI8C
+    masterchief:
+      email: timetableofficer@covenantuniversity.edu.edu.ng
+      failed_login_attempts: 0
+      logged_in: false
+      name: Ifeanyi Igweze
+      password: $2b$12$xCWTgfvBy5a.gydypwZUa.5HWy7VMIQUbaREO428wp0fjYRGoPWaK
+pre-authorized:
+  emails:
+  - timetableofficer@covenantuniversity.edu.edu.ng
