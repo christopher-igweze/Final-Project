@@ -29,10 +29,10 @@ def menu():
     st.sidebar.page_link("pages/viewTT.py", label="📄 View Timetable")
     st.sidebar.page_link("pages/constraints.py", label="🔒 Constraints")
     st.sidebar.page_link("pages/profile.py", label="🧙🏼‍♂️ Profile")
-    st.sidebar.markdown("---")
-    if st.sidebar.button("Logout", key="logoutbutton", type="secondary"):
-        authenticator.logout()
-        st.switch_page("app.py")
+    # st.sidebar.markdown("---")
+    # if st.sidebar.button("Logout", key="logoutbutton", type="secondary"):
+    #     authenticator.logout()
+    #     st.switch_page("app.py")
 
 
 def page_config():

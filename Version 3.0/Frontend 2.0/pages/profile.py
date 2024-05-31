@@ -69,7 +69,7 @@ try:
         # i'll set up an email system later
         container = st.empty()
         container.success(f"Here's the new password: {new_random_password}")  # Create a success alert
-        time.sleep(6)  # Wait 2 seconds
+        time.sleep(6)  # Wait 6 seconds
         container.empty()
         # The developer should securely transfer the new password to the user.
     elif username_of_forgotten_password == False:
@@ -89,7 +89,7 @@ try:
         # i'll set up an email system later
         container = st.empty()
         container.success(f"Here's your username: {username_of_forgotten_username}")  # Create a success alert
-        time.sleep(6)  # Wait 2 seconds
+        time.sleep(6)  # Wait 6 seconds
         container.empty()
         # The developer should securely transfer the username to the user.
     elif username_of_forgotten_username == False:
