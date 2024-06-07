@@ -26,7 +26,7 @@ def display_file_list():
     st.subheader("Programs")
     files = list_excel_files(EXCEL_DIR)
     for file in files:
-        col1, col2 = st.columns([3, 1])
+        col1, col2 = st.columns([4, 1])
 
         with col2:
             file_path = os.path.join(EXCEL_DIR, file)

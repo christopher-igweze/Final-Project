@@ -1,0 +1,42 @@
+Guide:
+
+Course Code - input the course code e.g CSC214
+No. of students - input the number of students e.g 150
+No. of units - input the number of units e.g 3
+Instructors - list the instructors id's that take the course e.g I2 or I3,I7,I13 (for multiple)
+Program of Origin - input the program of origin (the programs ID) e.g CIS01
+Elective - input 'E' if it's an elective and 'C' if it isn't
+Number of electives for the semester - input the number of electives needed to be taken that semester
+
+Programs and their ID's
+
+Industrial Maths						MATH01
+Computer Science						CIS01
+African Leadership and Development Studies			ALDC01
+Management and Information Sciences				CMIS01
+Micro-biology							BIO01
+Industrial Chemistry						CHM01
+Industrial Physics						PHY01
+English								ENG01
+Business Admin							BUS_AD01
+Psychology							PSY01
+Entreprenuership Studies					EDS01
+
+Lecturer's and their ID's
+
+Dr James Web							I1
+Mr. Mike Brown							I2
+Dr Steve Day							I3
+Mrs Jane Doe							I4
+Dr. Julia Blue							I5
+Prof. Conrad							I6
+Mrs. Eze							I7
+Mrs. Abiodun Theresa						I8
+Dr. Odusote Femi						I9
+Dr. Onii Ronke							I10
+Dr. Edeki							I11
+Mr. Peter							I12
+Dr. Theo							I13
+Dr. Ovie							I14
+Dr. Sanuu							I15
+Dr. Lanre Amodu							I16

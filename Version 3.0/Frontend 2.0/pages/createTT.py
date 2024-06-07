@@ -31,16 +31,30 @@ def store():
 st.header("Create a Timetable")
 
 # Path to the specific file you want to provide for download
-file_path = "../extracted_folder/master/dataset_cleaned1.xlsx"
+file_path = "../sheets/format.xlsx"
+file_path2 = "../sheets/guide.txt"
+
+col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
 
 # Display download button
-with open(file_path, "rb") as file:
-    st.download_button(
-        label="Download format",
-        data=file,
-        file_name="format.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+
+with col1:
+    with open(file_path, "rb") as file:
+        st.download_button(
+            label="Download format",
+            data=file,
+            file_name="format.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+with col2:
+    with open(file_path2, "rb") as file:
+        st.download_button(
+            label="Download Guide",
+            data=file,
+            file_name="guide.txt",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
 
 uploaded_file = st.file_uploader("Upload master.zip", type='zip', accept_multiple_files=False)
 if st.button("Create", key="create"):
