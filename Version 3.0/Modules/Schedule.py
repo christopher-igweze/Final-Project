@@ -1,3 +1,4 @@
+from py import test
 from Modules import dbMgr, rnd
 from Modules.DBMgr import Instructor, MeetingTime
 import enum
@@ -34,13 +35,13 @@ class Schedule:
     def initialize(self):
         # Create a list of big rooms and small rooms to speed up the room assignment process
         # I'll eventually have to do for lab courses
-        bigRoom = []
-        smallRoom = []
-        for i in range(0, len(dbMgr.get_rooms())):
-            if dbMgr.get_rooms()[i].get_seatingCapacity() > 300:
-                bigRoom.append(dbMgr.get_rooms()[i])
-            else:
-                smallRoom.append(dbMgr.get_rooms()[i])
+        # bigRoom = []
+        # smallRoom = []
+        # for i in range(0, len(dbMgr.get_rooms())):
+        #     if dbMgr.get_rooms()[i].get_seatingCapacity() >= 400:
+        #         bigRoom.append(dbMgr.get_rooms()[i])
+        #     else:
+        #         smallRoom.append(dbMgr.get_rooms()[i])
 
         # Chapel days constraint meeting times
         global course_colleges # Making this global so I can use it in the fitness class
@@ -65,12 +66,17 @@ class Schedule:
                         newClass.set_meetingTime(rnd.choice(thursdayService_meetingTimes))
                     else:
                         newClass.set_meetingTime(rnd.choice(tuesdayService_meetingTimes))
-                    # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
-                    if course.get_maxNumbOfStudents() > 300:
-                        newClass.set_room(bigRoom[rnd.randrange(0, len(bigRoom))])
-                    else:
-                        newClass.set_room(smallRoom[rnd.randrange(0, len(smallRoom))])
+                    # # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
+                    # if course.get_maxNumbOfStudents() >= 400:
+                    #     newClass.set_room(bigRoom[rnd.randrange(0, len(bigRoom))])
+                    # else:
+                    #     newClass.set_room(smallRoom[rnd.randrange(0, len(smallRoom))])
                     
+                    # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+                    rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+                    choice = rnd.choice(rooms)
+                    newClass.set_room(choice)
+
                     newClass.set_instructor(course.get_instructors())
                     self._classes.append(newClass)
                     course.set_class1(newClass)
@@ -89,13 +95,18 @@ class Schedule:
                         index = rnd.randrange(0, len(tuesdayService_meetingTimes)-1)
                         if tuesdayService_meetingTimes[index].get_sub() != tuesdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
                         class1.set_meetingTime(tuesdayService_meetingTimes[index])
-                    # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
-                    if course.get_maxNumbOfStudents() > 300:
-                        room = bigRoom[rnd.randrange(0, len(bigRoom))]
-                    else:
-                        room = smallRoom[rnd.randrange(0, len(smallRoom))]
-                    class1.set_room(room)
+                    # # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
+                    # if course.get_maxNumbOfStudents() > 300:
+                    #     room = bigRoom[rnd.randrange(0, len(bigRoom))]
+                    # else:
+                    #     room = smallRoom[rnd.randrange(0, len(smallRoom))]
+                    # class1.set_room(room)
                     
+                    # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+                    rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+                    choice = rnd.choice(rooms)
+                    class1.set_room(choice)
+
                     class1.set_instructor(course.get_instructors())
                     self._classes.append(class1)
 
@@ -107,7 +118,7 @@ class Schedule:
                     else:
                         class2.set_meetingTime(tuesdayService_meetingTimes[index+1])
                     
-                    class2.set_room(room)
+                    class2.set_room(choice)
                     
                     class2.set_instructor(course.get_instructors())
                     self._classes.append(class2)
@@ -130,13 +141,18 @@ class Schedule:
                         index = rnd.randrange(0, len(tuesdayService_meetingTimes)-1)
                         if tuesdayService_meetingTimes[index].get_sub() != tuesdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
                         class1.set_meetingTime(tuesdayService_meetingTimes[index])
-                    # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
-                    if course.get_maxNumbOfStudents() > 300:
-                        room = bigRoom[rnd.randrange(0, len(bigRoom))]
-                    else:
-                        room = smallRoom[rnd.randrange(0, len(smallRoom))]
-                    class1.set_room(room)
+                    # # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
+                    # if course.get_maxNumbOfStudents() >= 400:
+                    #     room = bigRoom[rnd.randrange(0, len(bigRoom))]
+                    # else:
+                    #     room = smallRoom[rnd.randrange(0, len(smallRoom))]
+                    # class1.set_room(room)
                     
+                    # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+                    rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+                    choice = rnd.choice(rooms)
+                    class1.set_room(choice)
+
                     class1.set_instructor(course.get_instructors())
                     self._classes.append(class1)
 
@@ -146,7 +162,7 @@ class Schedule:
                         class2.set_meetingTime(thursdayService_meetingTimes[index+1])
                     else:
                         class2.set_meetingTime(tuesdayService_meetingTimes[index+1])
-                    class2.set_room(room)
+                    class2.set_room(choice)
                     
                     class2.set_instructor(course.get_instructors())
                     self._classes.append(class2)
@@ -158,7 +174,17 @@ class Schedule:
                         class3.set_meetingTime(rnd.choice(meeting_times))
                         if class3.get_meetingTime().get_sub() != class1.get_meetingTime().get_sub():
                             break 
-                    class3.set_room(dbMgr.get_rooms()[rnd.randrange(0, len(dbMgr.get_rooms()))])
+                    # # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
+                    # if course.get_maxNumbOfStudents() >= 400:
+                    #     room = bigRoom[rnd.randrange(0, len(bigRoom))]
+                    # else:
+                    #     room = smallRoom[rnd.randrange(0, len(smallRoom))]
+                    # class3.set_room(room)
+
+                    # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+                    rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+                    choice = rnd.choice(rooms)
+                    class3.set_room(choice)
                     
                     class3.set_instructor(course.get_instructors())
                     self._classes.append(class3)
@@ -171,8 +197,29 @@ class Schedule:
     # Calculates the fitness of the schedule
     def calculate_fitness(self):
         self._conflicts = []
+        global test_list
+        test_list = []
+        cc_list = []
+        cc_list2 = []
         classes = self.get_classes()
+        global masterSchedule
+        masterSchedule = []
         for i in range(0, len(classes)):
+
+            theId = 0
+            theDept = classes[i].get_dept()
+            theCourse = classes[i].get_course()
+
+            newLecture = Lecture(theId, theDept, theCourse)
+            theId += 1
+
+            theRoom = classes[i].get_room()
+            theMT = classes[i].get_meetingTime()
+            theinstructor = classes[i].get_course().get_instructors()
+            newLecture.set_room(theRoom)
+            newLecture.set_meetingTime(theMT)
+            newLecture.set_instructor(theinstructor)
+            
 
             # I need to create a constraint for consecutive instructor and room booking for two unit and three unit courses (maybe should be a soft constraint)
             # Seating Capacity Constraint
@@ -180,6 +227,7 @@ class Schedule:
             seatingCapacityConflict.append(classes[i])
             if (classes[i].get_room().get_seatingCapacity() < classes[i].get_course().get_maxNumbOfStudents()):
                 self._conflicts.append(Conflict(ConflictType.NUMB_OF_STUDENTS, seatingCapacityConflict))
+                test_list.append(1)
 
             # Credit Hour Constraint
             # Isn't actually working. Come back to it.
@@ -188,11 +236,15 @@ class Schedule:
             course = classes[i].get_course()
             unit = course.get_credit_hours()
             if unit > 1:
+                crs = course.get_number()
                 period1 = int(course.get_class1().get_meetingTime().get_id()[2:])
                 period2 = int(course.get_class2().get_meetingTime().get_id()[2:])
+                cc_list.append([crs, period1, period2])
+                # print(period1 + period2)
                 if period2 != (period1 + 1):
                     self._conflicts.append(Conflict(ConflictType.CREDIT_HOURS, creditHourConflict))
-
+                    test_list.append(2)
+                    
             # Here I removed the instructor availability since all lectures are available through the week except for chapel days (Tue / Thur)
             # I need to create a new table for dept-instructor so that you can assign instructors to specific departments to make the availability work
             # I need to fully understand how (look down for 'this') works
@@ -201,16 +253,22 @@ class Schedule:
             conflictBetweenClasses.append(classes[i]) # this   
             if (college in ['CST', 'CMSS']) and (classes[i].get_meetingTime() in dbMgr.get_meetingTimes()[30:32]):
                 self._conflicts.append(Conflict(ConflictType.INSTRUCTOR_AVAILABILITY, conflictBetweenClasses))
+                test_list.append(3)
             elif (college not in ['CST', 'CMSS']) and (classes[i].get_meetingTime() in dbMgr.get_meetingTimes()[10:12]):
                 self._conflicts.append(Conflict(ConflictType.INSTRUCTOR_AVAILABILITY, conflictBetweenClasses))
+                test_list.append(4)
 
             # Consecutive Room Booking Constraint
             consecutiveRoomConflict = list()
             consecutiveRoomConflict.append(classes[i])
             course = classes[i].get_course()
             if course.get_credit_hours() > 1:
+                lc1 = str(course.get_class1().get_room().get_number())
+                lc2 = str(course.get_class2().get_room().get_number())
+                cc_list2.append([lc1, lc2])
                 if course.get_class1().get_room() != course.get_class2().get_room():
                     self._conflicts.append(Conflict(ConflictType.CONSECUTIVE_ROOM_BOOKING, consecutiveRoomConflict))
+                    test_list.append(5)
                         
 
             for j in range(0, len(classes)):
@@ -222,6 +280,7 @@ class Schedule:
                             roomBookingConflict.append(classes[i])
                             roomBookingConflict.append(classes[j])
                             self._conflicts.append(Conflict(ConflictType.ROOM_BOOKING, roomBookingConflict))
+                            test_list.append(6)
                         # This line checks if there are any common instructors between two classes.
                         # It does this by creating sets of instructors for each class and finding the intersection of these sets.
                         # If the intersection is not empty (i.e., there are common instructors), the condition is True.
@@ -231,12 +290,16 @@ class Schedule:
                             instructorBookingConflict.append(classes[i])
                             instructorBookingConflict.append(classes[j])
                             self._conflicts.append(Conflict(ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
+                            test_list.append(7)
 
 
         # I need to work on the fitness function so it assigns weights to the conflicts.
         # The weights would be the multiplicative factor
         # For multiple weights add them in the denominator
         # The plus one makes it such that when the number of conflicts is zero the total fitness would be one
+            masterSchedule.append(newLecture)
+
+        # print(test_list, cc_list, cc_list2)
         return 1 / ((1.0 * len(self._conflicts) + 1))
     
     # String representation of the schedule
@@ -295,3 +358,12 @@ class Conflict:
 
     def __str__(self):
         return str(self._conflictType) + " " + str("  and  ".join(map(str, self._conflictBetweenClasses)))
+
+class updatedSchedule:
+    def __init__(self, solution) -> None:
+        self._solution: list[Lecture] = solution
+    def get_solution(self): return self._solution
+    def set_solution(self, solution): self._solution = solution
+
+def finalSchedule():
+    return masterSchedule

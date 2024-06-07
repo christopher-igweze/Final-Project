@@ -3,7 +3,7 @@ from Modules import POPULATION_SIZE
 from Modules.Population import Population
 from Modules.Display import DisplayMgr
 from Modules.Genetic_Algo import GeneticAlgorithm
-
+from Modules.Schedule import Schedule, updatedSchedule, finalSchedule
 # Function to find the fittest schedule
 def find_fittest_schedule(verboseFlag):
     # Initialize generation number
@@ -39,6 +39,8 @@ def find_fittest_schedule(verboseFlag):
     # Print the number of generations it took to find a solution
     print("> solution found after " + str(generationNumber) + " generations")
     # Return the fittest schedule
+    final = finalSchedule()
+    DisplayMgr.display_schedule_as_tables(final)
     return population.get_schedules()[0]
 
 # Function to handle command line inputs
