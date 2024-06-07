@@ -29,9 +29,26 @@ def store():
     # extracted_folder = os.path.join('C:/Users/USER/Documents/Important Files/Final Project/Version 3.0', os.path.splitext(uploaded_file.name)[0])
 
 st.header("Create a Timetable")
+
+# Path to the specific file you want to provide for download
+file_path = "../extracted_folder/master/dataset_cleaned1.xlsx"
+
+# Display download button
+with open(file_path, "rb") as file:
+    st.download_button(
+        label="Download format",
+        data=file,
+        file_name="format.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
 uploaded_file = st.file_uploader("Upload master.zip", type='zip', accept_multiple_files=False)
 if st.button("Create", key="create"):
     store()
+
+
+
+
 
 
     

@@ -1,8 +1,64 @@
 import streamlit as st
+import pandas as pd
+import os
 from utils import load_css, menu, page_config
 
 page_config()
 menu()
 load_css()
-st.title("Database Page")
-st.write("Welcome to the database page. This is the first page of your menu.")
+
+# Directory containing the Excel files
+EXCEL_DIR = "../extracted_folder/master"
+
+# Initialize session state variables
+if 'active_page' not in st.session_state:
+    st.session_state.active_page = 'file_list'
+if 'selected_file' not in st.session_state:
+    st.session_state.selected_file = None
+
+# Function to list Excel files in the directory
+def list_excel_files(directory):
+    return [f for f in os.listdir(directory) if f.endswith('.xlsx')]
+
+# Function to display the list of Excel files
+def display_file_list():
+    st.title("Database Page")
+    st.subheader("Programs")
+    files = list_excel_files(EXCEL_DIR)
+    for file in files:
+        col1, col2 = st.columns([3, 1])
+
+        with col2:
+            file_path = os.path.join(EXCEL_DIR, file)
+            with open(file_path, "rb") as f:
+                st.download_button(
+                    label=f"Download",
+                    data=f,
+                    file_name=file,
+                    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                )
+        with col1:
+            if st.button(file):
+                st.session_state.selected_file = file
+                st.session_state.active_page = 'file_details'
+
+# Function to display the sheets of the selected workbook
+def display_file_details():
+    st.title(f"Program: {st.session_state.selected_file}")
+    file_path = os.path.join(EXCEL_DIR, st.session_state.selected_file)
+    excel_file = pd.ExcelFile(file_path)
+    
+    for sheet_name in excel_file.sheet_names:
+        st.subheader(f"Level: {sheet_name}")
+        df = pd.read_excel(file_path, sheet_name=sheet_name)
+        st.table(df)
+    
+    if st.button("Back"):
+        st.session_state.active_page = 'file_list'
+        st.session_state.selected_file = None
+
+# Main application logic
+if st.session_state.active_page == 'file_list':
+    display_file_list()
+elif st.session_state.active_page == 'file_details':
+    display_file_details()
