@@ -7,7 +7,7 @@ import time
 
 page_config()
 load_css()
-
+# st.image("assets/images/cu.png")
 path = os.path.join(os.path.dirname(__file__), '..', 'config.yaml')
 
 with open(path) as file:

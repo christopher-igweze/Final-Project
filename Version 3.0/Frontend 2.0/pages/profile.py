@@ -10,7 +10,7 @@ import time
 page_config()
 load_css()
 menu()
-
+# st.image("assets/images/cu.png")
 st.title("Profile Page")
 st.write("This page is for viewing and editing your profile information.")
 

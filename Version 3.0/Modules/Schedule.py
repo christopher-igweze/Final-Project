@@ -299,7 +299,7 @@ class Schedule:
         # The plus one makes it such that when the number of conflicts is zero the total fitness would be one
             masterSchedule.append(newLecture)
 
-        # print(test_list, cc_list, cc_list2)
+        print(test_list, cc_list, cc_list2)
         return 1 / ((1.0 * len(self._conflicts) + 1))
     
     # String representation of the schedule

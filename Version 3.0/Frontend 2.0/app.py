@@ -8,7 +8,7 @@ page_config()
 
 def index_page():
     load_css()
-    st.image("assets/images/banner.png")  # Replace with your image path
+    st.image("assets/images/updatedcu2.png")  # Replace with your image path
 
 
     path = os.path.join(os.path.dirname(__file__), 'config.yaml')

@@ -22,6 +22,7 @@ def list_excel_files(directory):
 
 # Function to display the list of Excel files
 def display_file_list():
+    # st.image("assets/images/cu.png")
     st.title("Database Page")
     st.subheader("Programs")
     files = list_excel_files(EXCEL_DIR)
@@ -44,6 +45,7 @@ def display_file_list():
 
 # Function to display the sheets of the selected workbook
 def display_file_details():
+    # st.image("assets/images/cu.png")
     st.title(f"Program: {st.session_state.selected_file}")
     file_path = os.path.join(EXCEL_DIR, st.session_state.selected_file)
     excel_file = pd.ExcelFile(file_path)

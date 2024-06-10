@@ -28,6 +28,7 @@ def store():
     # Get the extracted folder path
     # extracted_folder = os.path.join('C:/Users/USER/Documents/Important Files/Final Project/Version 3.0', os.path.splitext(uploaded_file.name)[0])
 
+# st.image("assets/images/cu.png")
 st.header("Create a Timetable")
 
 # Path to the specific file you want to provide for download
