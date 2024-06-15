@@ -1,11 +1,21 @@
 import streamlit as st
-from utils import load_css, page_config
+from utils import load_css
 import yaml, os
 import streamlit_authenticator as stauth
 from yaml.loader import SafeLoader
 import time
 
-page_config()
+st.set_page_config(
+    page_title="CU Timetable App",
+    page_icon="📅",
+    layout="wide",
+    initial_sidebar_state="auto",
+    menu_items={
+        'Get Help': None,
+        'Report a bug': None,
+        'About': "This is an automated timetable generator app for Covenant University.\n\n**FUN FACT:** It uses a hybrid of genetic algorithm and simulated annealing to generate a timetable for the university."
+    }
+)
 load_css()
 # st.image("assets/images/cu.png")
 path = os.path.join(os.path.dirname(__file__), '..', 'config.yaml')
@@ -75,19 +85,9 @@ passd = False
 col1, col2 = st.columns([0.15, 0.85])
 
 with col1:
-    if st.button("Forgot Username"):
-        user = True
-        passd = False
+    with st.popover("Forgot Username"):
+        forgot_username()
 
 with col2:
-    if st.button("Forgot Password"):
-        user = False
-        passd = True
-
-
-if user == True:
-    forgot_username()
-if passd == True:
-    forgot_password()
-
-# make it a pop up form
+    with st.popover("Forgot Password"):
+        forgot_password()

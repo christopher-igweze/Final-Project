@@ -35,16 +35,3 @@ def menu():
     #     authenticator.logout()
     #     st.switch_page("app.py")
 
-
-def page_config():
-    st.set_page_config(
-    page_title="CU Timetable App",
-    page_icon="📅",
-    layout="wide",
-    initial_sidebar_state="auto",
-    menu_items={
-        'Get Help': None,
-        'Report a bug': None,
-        'About': "This is an automated timetable generator app for Covenant University.\n\n**FUN FACT:** It uses a hybrid of genetic algorithm and simulated annealing to generate a timetable for the university."
-    }
-)

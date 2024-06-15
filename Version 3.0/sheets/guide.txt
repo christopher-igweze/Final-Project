@@ -11,9 +11,9 @@ Number of electives for the semester - input the number of electives needed to b
 Programs and their ID's
 
 Industrial Maths						MATH01
-Computer Science						CIS01
+Computer Science						CSC01
 African Leadership and Development Studies			ALDC01
-Management and Information Sciences				CMIS01
+Management and Information Sciences				MIS01
 Micro-biology							BIO01
 Industrial Chemistry						CHM01
 Industrial Physics						PHY01
@@ -21,6 +21,11 @@ English								ENG01
 Business Admin							BUS_AD01
 Psychology							PSY01
 Entreprenuership Studies					EDS01
+Accounting							ACC01
+Economics							ECO01
+Sociology							SOC01
+Political Science						POL01
+
 
 Lecturer's and their ID's
 

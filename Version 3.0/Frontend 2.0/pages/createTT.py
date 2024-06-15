@@ -1,10 +1,20 @@
 import shutil
 import streamlit as st
-from utils import load_css, page_config, menu
+from utils import load_css, menu
 import zipfile
 import os
 
-page_config()
+st.set_page_config(
+    page_title="CU Timetable App",
+    page_icon="📅",
+    layout="wide",
+    initial_sidebar_state="auto",
+    menu_items={
+        'Get Help': None,
+        'Report a bug': None,
+        'About': "This is an automated timetable generator app for Covenant University.\n\n**FUN FACT:** It uses a hybrid of genetic algorithm and simulated annealing to generate a timetable for the university."
+    }
+)
 menu()
 load_css()
 
@@ -58,8 +68,19 @@ with col2:
         )
 
 uploaded_file = st.file_uploader("Upload master.zip", type='zip', accept_multiple_files=False)
-if st.button("Create", key="create"):
-    store()
+
+if "visibility" not in st.session_state:
+    st.session_state.disabled = False
+    option = st.selectbox(
+        "What semester are you creating a timetable for?",
+        ("Alpha", "Omega"),
+        index=None,
+        placeholder="Select a semester...",
+    )
+
+    if st.button("Create", key="create", disabled=not option or uploaded_file is None):
+         store()
+
 
 
 

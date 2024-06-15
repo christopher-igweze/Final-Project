@@ -41,9 +41,11 @@ def find_fittest_schedule(verboseFlag):
     # Print the number of generations it took to find a solution
     print("> solution found after " + str(generationNumber) + " generations")
     # Return the fittest schedule
-    final = finalSchedule()
+    final = finalSchedule()[0]
+    final2 = finalSchedule()[1]
     DisplayMgr.display_schedule_as_tables(final)
-    output_schedule()
+    DisplayMgr.display_schedule_as_tables(final2)
+    # output_schedule()
     return population.get_schedules()[0]
 
 # Function to handle command line inputs

@@ -81,7 +81,7 @@ class Schedule:
                     self._classes.append(newClass)
                     course.set_class1(newClass)
 
-                if course.get_credit_hours() == 2:
+                if course.get_credit_hours() == 2 or course.get_credit_hours() == 0:
                     class1 = Lecture(self._classNumb, dept, course)
                     self._classNumb += 1
                     # Here I will check for their service days and set a meeting time appropriately
@@ -202,8 +202,23 @@ class Schedule:
         cc_list = []
         cc_list2 = []
         classes = self.get_classes()
-        global masterSchedule
+        global masterSchedule, masterSchedule2
         masterSchedule = []
+        masterSchedule2 = []
+        courses = dbMgr.get_courses()
+        for i in courses:
+            unit = int(i.get_credit_hours())
+            if unit == 1:
+                masterSchedule2.append(i.get_class1())
+            elif unit == 0 or unit == 2:
+                masterSchedule2.append(i.get_class1())
+                masterSchedule2.append(i.get_class2())
+            else:
+                masterSchedule2.append(i.get_class1())
+                masterSchedule2.append(i.get_class2())
+                masterSchedule2.append(i.get_class3())
+
+
         for i in range(0, len(classes)):
 
             theId = 0
@@ -298,6 +313,7 @@ class Schedule:
         # For multiple weights add them in the denominator
         # The plus one makes it such that when the number of conflicts is zero the total fitness would be one
             masterSchedule.append(newLecture)
+            
 
         print(test_list, cc_list, cc_list2)
         return 1 / ((1.0 * len(self._conflicts) + 1))
@@ -363,7 +379,8 @@ class updatedSchedule:
     def __init__(self, solution) -> None:
         self._solution: list[Lecture] = solution
     def get_solution(self): return self._solution
-    def set_solution(self, solution): self._solution = solution
 
 def finalSchedule():
-    return masterSchedule
+    TT = updatedSchedule(masterSchedule)
+    mainTimetable = TT.get_solution()
+    return mainTimetable, masterSchedule
