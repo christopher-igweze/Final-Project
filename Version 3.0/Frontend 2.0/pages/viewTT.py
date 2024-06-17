@@ -18,7 +18,7 @@ menu()
 # st.image("assets/images/cu.png")
 st.title("View Timetable")
 
-file_path = "C:/Users/USER/Documents/Important Files/Final Project/Version 3.0/sheets/final_timetable.xlsx"
+file_path = "../sheets/final_timetable.xlsx"
 
 # Display download button
 with open(file_path, "rb") as file:
