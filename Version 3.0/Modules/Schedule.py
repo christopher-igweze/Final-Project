@@ -206,6 +206,7 @@ class Schedule:
         masterSchedule = []
         masterSchedule2 = []
         courses = dbMgr.get_courses()
+        checked = []
         for i in courses:
             unit = int(i.get_credit_hours())
             if unit == 1:
@@ -220,20 +221,44 @@ class Schedule:
 
 
         for i in range(0, len(classes)):
-
+            checked.append(classes[i])
             theId = 0
             theDept = classes[i].get_dept()
             theCourse = classes[i].get_course()
-
+        
             newLecture = Lecture(theId, theDept, theCourse)
             theId += 1
-
-            theRoom = classes[i].get_room()
-            theMT = classes[i].get_meetingTime()
-            theinstructor = classes[i].get_course().get_instructors()
-            newLecture.set_room(theRoom)
-            newLecture.set_meetingTime(theMT)
-            newLecture.set_instructor(theinstructor)
+        
+            if classes[i].get_course().get_credit_hours() == 1:
+                theRoom = classes[i].get_course().get_class1().get_room()
+                theMT = classes[i].get_course().get_class1().get_meetingTime()
+                theinstructor = classes[i].get_course().get_instructors()
+                newLecture.set_room(theRoom)
+                newLecture.set_meetingTime(theMT)
+                newLecture.set_instructor(theinstructor)
+        
+            if classes[i].get_course().get_credit_hours() == 3 or classes[i].get_course().get_credit_hours() == 2 or classes[i].get_course().get_credit_hours() == 0:
+                if len(checked) >= 3 and checked[-3].get_course() == classes[i].get_course():
+                    theRoom = classes[i].get_course().get_class3().get_room()
+                    theMT = classes[i].get_course().get_class3().get_meetingTime()
+                    theinstructor = classes[i].get_course().get_instructors()
+                    newLecture.set_room(theRoom)
+                    newLecture.set_meetingTime(theMT)
+                    newLecture.set_instructor(theinstructor)
+                elif len(checked) >= 2 and checked[-2].get_course() == classes[i].get_course():
+                    theRoom = classes[i].get_course().get_class2().get_room()
+                    theMT = classes[i].get_course().get_class2().get_meetingTime()
+                    theinstructor = classes[i].get_course().get_instructors()
+                    newLecture.set_room(theRoom)
+                    newLecture.set_meetingTime(theMT)
+                    newLecture.set_instructor(theinstructor)
+                else:
+                    theRoom = classes[i].get_course().get_class1().get_room()
+                    theMT = classes[i].get_course().get_class1().get_meetingTime()
+                    theinstructor = classes[i].get_course().get_instructors()
+                    newLecture.set_room(theRoom)
+                    newLecture.set_meetingTime(theMT)
+                    newLecture.set_instructor(theinstructor)
             
 
             # I need to create a constraint for consecutive instructor and room booking for two unit and three unit courses (maybe should be a soft constraint)
@@ -246,15 +271,20 @@ class Schedule:
 
             # Credit Hour Constraint
             # Isn't actually working. Come back to it.
-            creditHourConflict = list()
-            creditHourConflict.append(classes[i])
+            creditHourConflict = []
             course = classes[i].get_course()
             unit = course.get_credit_hours()
             if unit > 1:
                 crs = course.get_number()
                 period1 = int(course.get_class1().get_meetingTime().get_id()[2:])
                 period2 = int(course.get_class2().get_meetingTime().get_id()[2:])
-                cc_list.append([crs, period1, period2])
+                period3 = None
+                if unit == 3:
+                    period3 = int(course.get_class3().get_meetingTime().get_id()[2:])
+                if newLecture.get_meetingTime().get_id()[2:] == period1:
+                    stuff = True
+                else : stuff = False
+                cc_list.append([crs, period1, period2, stuff])
                 # print(period1 + period2)
                 if period2 != (period1 + 1):
                     self._conflicts.append(Conflict(ConflictType.CREDIT_HOURS, creditHourConflict))
@@ -280,14 +310,17 @@ class Schedule:
             if course.get_credit_hours() > 1:
                 lc1 = str(course.get_class1().get_room().get_number())
                 lc2 = str(course.get_class2().get_room().get_number())
-                cc_list2.append([lc1, lc2])
-                if course.get_class1().get_room() != course.get_class2().get_room():
+                lc3 = None
+                if course.get_credit_hours() == 3:
+                    lc3 = str(course.get_class3().get_room().get_number())
+                cc_list2.append([lc1, lc2, lc3])
+                if course.get_class1().get_room().get_number() != course.get_class2().get_room().get_number():
                     self._conflicts.append(Conflict(ConflictType.CONSECUTIVE_ROOM_BOOKING, consecutiveRoomConflict))
                     test_list.append(5)
                         
 
             for j in range(0, len(classes)):
-                if (j >= i):
+                if (classes[j].get_course().get_number() != classes[i].get_course().get_number()):
                     if (classes[i].get_meetingTime() == classes[j].get_meetingTime() and
                     classes[i].get_id() != classes[j].get_id()):
                         if (classes[i].get_room() == classes[j].get_room()):
@@ -315,7 +348,8 @@ class Schedule:
             masterSchedule.append(newLecture)
             
 
-        print(test_list, cc_list, cc_list2)
+        # print(test_list, cc_list, cc_list2)
+        # print(len(classes),len(masterSchedule))
         return 1 / ((1.0 * len(self._conflicts) + 1))
     
     # String representation of the schedule

@@ -1,4 +1,5 @@
 # Importing necessary modules and constants
+from xml.etree.ElementPath import findall
 from Modules import POPULATION_SIZE
 from Modules.Population import Population
 from Modules.Display import DisplayMgr
@@ -44,8 +45,8 @@ def find_fittest_schedule(verboseFlag):
     final = finalSchedule()[0]
     final2 = finalSchedule()[1]
     DisplayMgr.display_schedule_as_tables(final)
-    DisplayMgr.display_schedule_as_tables(final2)
-    # output_schedule()
+    # DisplayMgr.display_schedule_as_tables(final2)
+    output_schedule()
     return population.get_schedules()[0]
 
 # Function to handle command line inputs

@@ -6,7 +6,7 @@ import pandas as pd
 
 def output_schedule():
     sheets = ["mon", "tue", "wed", "thur", "fri"]
-    classes = finalSchedule()
+    classes = finalSchedule()[0]
     roomsobjects = dbMgr.get_rooms()
     rooms = [i.get_number() for i in roomsobjects]
     rooms.sort()
