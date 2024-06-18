@@ -3,6 +3,7 @@ import streamlit as st
 from utils import load_css, menu
 import zipfile
 import os
+import subprocess
 
 st.set_page_config(
     page_title="CU Timetable App",
@@ -80,12 +81,19 @@ if "visibility" not in st.session_state:
 
     if st.button("Create", key="create", disabled=not option or uploaded_file is None):
          store()
+         with st.spinner('Creating timetable...'):
+            proc = subprocess.Popen(['python', 'C:/Users/USER/Documents/Important Files/Final Project/Version 3.0/main.py'], stdin=subprocess.PIPE)
+            proc.communicate(input=b'f\n')   
+
+         st.success('Timetable finished. Navigate to timetable from the sidebar.')
 
 
+# if st.button("test", key="test"):
+#     with st.spinner('Creating timetable...'):
+#         proc = subprocess.Popen(['python', 'C:/Users/USER/Documents/Important Files/Final Project/Version 3.0/main.py'], stdin=subprocess.PIPE)
+#         proc.communicate(input=b'f\n')   
 
-
-
-
-
+#     st.success('Timetable finished. Navigate to timetable from the sidebar.')
+        
     
 
