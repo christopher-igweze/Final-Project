@@ -1,6 +1,6 @@
 from py import test
 from Modules import dbMgr, rnd
-from Modules.DBMgr import Instructor, MeetingTime
+from Modules.DBMgr import Course, Department, Instructor, MeetingTime
 import enum
 
 # Class to manage the scheduling process
@@ -33,15 +33,6 @@ class Schedule:
 
     # Initializes the schedule
     def initialize(self):
-        # Create a list of big rooms and small rooms to speed up the room assignment process
-        # I'll eventually have to do for lab courses
-        # bigRoom = []
-        # smallRoom = []
-        # for i in range(0, len(dbMgr.get_rooms())):
-        #     if dbMgr.get_rooms()[i].get_seatingCapacity() >= 400:
-        #         bigRoom.append(dbMgr.get_rooms()[i])
-        #     else:
-        #         smallRoom.append(dbMgr.get_rooms()[i])
 
         # Chapel days constraint meeting times
         global course_colleges # Making this global so I can use it in the fitness class
@@ -49,13 +40,509 @@ class Schedule:
         tuesdayService_meetingTimes = [meetingTime for meetingTime in dbMgr.get_meetingTimes() if meetingTime not in dbMgr.get_meetingTimes()[10:12]]
         thursdayService_meetingTimes = [meetingTime for meetingTime in dbMgr.get_meetingTimes() if meetingTime not in dbMgr.get_meetingTimes()[30:32]]
         course_colleges = {i[0]: i[1] for i in dbMgr.get_courseColleges()}
-
+        meeting_times = dbMgr.get_meetingTimes()
         depts = self._data.get_depts()
+        courses = dbMgr._select_courses()
+        uwc = ['GST', 'EDS', 'TMC', 'DLD', 'CIT']
+        special = ['PHY', 'ARC', 'BIO', 'MCB', 'BLD', 'BCH', 'CHM']
+        # rest = ['GST', 'EDS', 'TMC', 'DLD', 'PHY', 'ARC', 'BIO', 'MCB', 'BLD', 'BCH', 'CHM']
+        uwcC = [x for x in courses if x.get_name()[:2] in uwc]
+        specialC = [x for x in courses if x.get_name()[:2] in special]
+        # restC = [x for x in courses if x.get_name()[:2] in rest]
+        done: list[Course] = []
+        # depts = self._data._select_courseDept()
+
+        # # Schedule university wide courses first, then special lab courses(for now set courses in their labs), then the rest.
+        # # This is for UWC
+        # for course in uwcC:
+        #     Dept = depts.get(course.get_number())
+        #     dept = Department(Dept, dbMgr._select_dept_courses(Dept))
+        #     if course.get_name()[:3] == 'CIT1':
+                
+        #         if course.get_credit_hours() == 1:
+        #             newClass = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             # Here I will check for their service days and set a meeting time appropriately
+        #             college = course_colleges.get(course.get_number())
+                    
+        #             if college == 'CST' or college == 'CMSS':
+        #                 newClass.set_meetingTime(rnd.choice(thursdayService_meetingTimes))
+        #             else:
+        #                 newClass.set_meetingTime(rnd.choice(tuesdayService_meetingTimes))
+                    
+        #             # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #             rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #             choice = rnd.choice(rooms)
+        #             newClass.set_room(choice)
+
+        #             newClass.set_instructor(course.get_instructors())
+        #             self._classes.append(newClass)
+        #             course.set_class1(newClass)
+
+        #         if course.get_credit_hours() == 2 or course.get_credit_hours() == 0:
+        #             class1 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             # Here I will check for their service days and set a meeting time appropriately
+        #             college = course_colleges.get(course.get_number())
+                    
+        #             if college == 'CST' or college == 'CMSS':
+        #                 index = rnd.randrange(0, len(thursdayService_meetingTimes)-1)
+        #                 if thursdayService_meetingTimes[index].get_sub() != thursdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #                 class1.set_meetingTime(thursdayService_meetingTimes[index])
+        #             else:
+        #                 index = rnd.randrange(0, len(tuesdayService_meetingTimes)-1)
+        #                 if tuesdayService_meetingTimes[index].get_sub() != tuesdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #                 class1.set_meetingTime(tuesdayService_meetingTimes[index])
+                    
+        #             # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #             rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #             choice = rnd.choice(rooms)
+        #             class1.set_room(choice)
+
+        #             class1.set_instructor(course.get_instructors())
+        #             self._classes.append(class1)
+
+        #             class2 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+                    
+        #             if college == 'CST' or college == 'CMSS':
+        #                 class2.set_meetingTime(thursdayService_meetingTimes[index+1])
+        #             else:
+        #                 class2.set_meetingTime(tuesdayService_meetingTimes[index+1])
+                    
+        #             class2.set_room(choice)
+                    
+        #             class2.set_instructor(course.get_instructors())
+        #             self._classes.append(class2)
+
+        #             course.set_class1(class1)
+        #             course.set_class2(class2)
+
+        #         if course.get_credit_hours() == 3:
+                    
+        #             class1 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             # Here I will check for their service days and set a meeting time appropriately
+        #             college = course_colleges.get(course.get_number())
+                    
+        #             if college == 'CST' or college == 'CMSS':
+        #                 index = rnd.randrange(0, len(thursdayService_meetingTimes)-1)
+        #                 if thursdayService_meetingTimes[index].get_sub() != thursdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #                 class1.set_meetingTime(thursdayService_meetingTimes[index])
+        #             else:
+        #                 index = rnd.randrange(0, len(tuesdayService_meetingTimes)-1)
+        #                 if tuesdayService_meetingTimes[index].get_sub() != tuesdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #                 class1.set_meetingTime(tuesdayService_meetingTimes[index])
+                    
+        #             # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #             rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #             choice = rnd.choice(rooms)
+        #             class1.set_room(choice)
+
+        #             class1.set_instructor(course.get_instructors())
+        #             self._classes.append(class1)
+
+        #             class2 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             if college == 'CST' or college == 'CMSS':
+        #                 class2.set_meetingTime(thursdayService_meetingTimes[index+1])
+        #             else:
+        #                 class2.set_meetingTime(tuesdayService_meetingTimes[index+1])
+        #             class2.set_room(choice)
+                    
+        #             class2.set_instructor(course.get_instructors())
+        #             self._classes.append(class2)
+
+        #             class3 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             while True:
+        #                 meeting_times = thursdayService_meetingTimes if college in ['CST', 'CMSS'] else tuesdayService_meetingTimes
+        #                 class3.set_meetingTime(rnd.choice(meeting_times))
+        #                 if class3.get_meetingTime().get_sub() != class1.get_meetingTime().get_sub():
+        #                     break 
+
+        #             # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #             rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #             choice = rnd.choice(rooms)
+        #             class3.set_room(choice)
+                    
+        #             class3.set_instructor(course.get_instructors())
+        #             self._classes.append(class3)
+                    
+        #             course.set_class1(class1)
+        #             course.set_class2(class2)
+        #             course.set_class3(class3)
+        
+        #         done.append(course)
+        #     else:
+                    
+        #         if course.get_credit_hours() == 1:
+        #             newClass = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             # Here I will check for their service days and set a meeting time appropriately
+        #             college = course_colleges.get(course.get_number())
+                    
+        #             if college == 'CST' or college == 'CMSS':
+        #                 newClass.set_meetingTime(rnd.choice(thursdayService_meetingTimes))
+        #             else:
+        #                 newClass.set_meetingTime(rnd.choice(tuesdayService_meetingTimes))
+                    
+        #             # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #             rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #             choice = rnd.choice(rooms)
+        #             newClass.set_room(choice)
+
+        #             newClass.set_instructor(course.get_instructors())
+        #             self._classes.append(newClass)
+        #             course.set_class1(newClass)
+
+        #         if course.get_credit_hours() == 2 or course.get_credit_hours() == 0:
+        #             class1 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             # Here I will check for their service days and set a meeting time appropriately
+        #             college = course_colleges.get(course.get_number())
+                    
+        #             if college == 'CST' or college == 'CMSS':
+        #                 index = rnd.randrange(0, len(thursdayService_meetingTimes)-1)
+        #                 if thursdayService_meetingTimes[index].get_sub() != thursdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #                 class1.set_meetingTime(thursdayService_meetingTimes[index])
+        #             else:
+        #                 index = rnd.randrange(0, len(tuesdayService_meetingTimes)-1)
+        #                 if tuesdayService_meetingTimes[index].get_sub() != tuesdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #                 class1.set_meetingTime(tuesdayService_meetingTimes[index])
+                    
+        #             # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #             rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #             choice = rnd.choice(rooms)
+        #             class1.set_room(choice)
+
+        #             class1.set_instructor(course.get_instructors())
+        #             self._classes.append(class1)
+
+        #             class2 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+                    
+        #             if college == 'CST' or college == 'CMSS':
+        #                 class2.set_meetingTime(thursdayService_meetingTimes[index+1])
+        #             else:
+        #                 class2.set_meetingTime(tuesdayService_meetingTimes[index+1])
+                    
+        #             class2.set_room(choice)
+                    
+        #             class2.set_instructor(course.get_instructors())
+        #             self._classes.append(class2)
+
+        #             course.set_class1(class1)
+        #             course.set_class2(class2)
+
+        #         if course.get_credit_hours() == 3:
+                    
+        #             class1 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             # Here I will check for their service days and set a meeting time appropriately
+        #             college = course_colleges.get(course.get_number())
+                    
+        #             if college == 'CST' or college == 'CMSS':
+        #                 index = rnd.randrange(0, len(thursdayService_meetingTimes)-1)
+        #                 if thursdayService_meetingTimes[index].get_sub() != thursdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #                 class1.set_meetingTime(thursdayService_meetingTimes[index])
+        #             else:
+        #                 index = rnd.randrange(0, len(tuesdayService_meetingTimes)-1)
+        #                 if tuesdayService_meetingTimes[index].get_sub() != tuesdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #                 class1.set_meetingTime(tuesdayService_meetingTimes[index])
+                    
+        #             # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #             rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #             choice = rnd.choice(rooms)
+        #             class1.set_room(choice)
+
+        #             class1.set_instructor(course.get_instructors())
+        #             self._classes.append(class1)
+
+        #             class2 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             if college == 'CST' or college == 'CMSS':
+        #                 class2.set_meetingTime(thursdayService_meetingTimes[index+1])
+        #             else:
+        #                 class2.set_meetingTime(tuesdayService_meetingTimes[index+1])
+        #             class2.set_room(choice)
+                    
+        #             class2.set_instructor(course.get_instructors())
+        #             self._classes.append(class2)
+
+        #             class3 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             while True:
+        #                 meeting_times = thursdayService_meetingTimes if college in ['CST', 'CMSS'] else tuesdayService_meetingTimes
+        #                 class3.set_meetingTime(rnd.choice(meeting_times))
+        #                 if class3.get_meetingTime().get_sub() != class1.get_meetingTime().get_sub():
+        #                     break 
+
+        #             # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #             rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #             choice = rnd.choice(rooms)
+        #             class3.set_room(choice)
+                    
+        #             class3.set_instructor(course.get_instructors())
+        #             self._classes.append(class3)
+                    
+        #             course.set_class1(class1)
+        #             course.set_class2(class2)
+        #             course.set_class3(class3)
+        
+        #         done.append(course)
+        # # This is for Special
+        # for course in specialC:
+        #     Dept = depts.get(course.get_number())
+        #     dept = Department(Dept, dbMgr._select_dept_courses(Dept))
+        
+        #     if course.get_credit_hours() == 1:
+        #         newClass = Lecture(self._classNumb, dept, course)
+        #         self._classNumb += 1
+        #         # Here I will check for their service days and set a meeting time appropriately
+        #         college = course_colleges.get(course.get_number())
+                
+        #         if college == 'CST' or college == 'CMSS':
+        #             newClass.set_meetingTime(rnd.choice(thursdayService_meetingTimes))
+        #         else:
+        #             newClass.set_meetingTime(rnd.choice(tuesdayService_meetingTimes))
+                
+        #         # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #         rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #         choice = rnd.choice(rooms)
+        #         newClass.set_room(choice)
+
+        #         newClass.set_instructor(course.get_instructors())
+        #         self._classes.append(newClass)
+        #         course.set_class1(newClass)
+
+        #     if course.get_credit_hours() == 2 or course.get_credit_hours() == 0:
+        #         class1 = Lecture(self._classNumb, dept, course)
+        #         self._classNumb += 1
+        #         # Here I will check for their service days and set a meeting time appropriately
+        #         college = course_colleges.get(course.get_number())
+                
+        #         if college == 'CST' or college == 'CMSS':
+        #             index = rnd.randrange(0, len(thursdayService_meetingTimes)-1)
+        #             if thursdayService_meetingTimes[index].get_sub() != thursdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #             class1.set_meetingTime(thursdayService_meetingTimes[index])
+        #         else:
+        #             index = rnd.randrange(0, len(tuesdayService_meetingTimes)-1)
+        #             if tuesdayService_meetingTimes[index].get_sub() != tuesdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #             class1.set_meetingTime(tuesdayService_meetingTimes[index])
+                
+        #         # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #         rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #         choice = rnd.choice(rooms)
+        #         class1.set_room(choice)
+
+        #         class1.set_instructor(course.get_instructors())
+        #         self._classes.append(class1)
+
+        #         class2 = Lecture(self._classNumb, dept, course)
+        #         self._classNumb += 1
+                
+        #         if college == 'CST' or college == 'CMSS':
+        #             class2.set_meetingTime(thursdayService_meetingTimes[index+1])
+        #         else:
+        #             class2.set_meetingTime(tuesdayService_meetingTimes[index+1])
+                
+        #         class2.set_room(choice)
+                
+        #         class2.set_instructor(course.get_instructors())
+        #         self._classes.append(class2)
+
+        #         course.set_class1(class1)
+        #         course.set_class2(class2)
+
+        #     if course.get_credit_hours() == 3:
+                
+        #         class1 = Lecture(self._classNumb, dept, course)
+        #         self._classNumb += 1
+        #         # Here I will check for their service days and set a meeting time appropriately
+        #         college = course_colleges.get(course.get_number())
+                
+        #         if college == 'CST' or college == 'CMSS':
+        #             index = rnd.randrange(0, len(thursdayService_meetingTimes)-1)
+        #             if thursdayService_meetingTimes[index].get_sub() != thursdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #             class1.set_meetingTime(thursdayService_meetingTimes[index])
+        #         else:
+        #             index = rnd.randrange(0, len(tuesdayService_meetingTimes)-1)
+        #             if tuesdayService_meetingTimes[index].get_sub() != tuesdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #             class1.set_meetingTime(tuesdayService_meetingTimes[index])
+                
+        #         # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #         rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #         choice = rnd.choice(rooms)
+        #         class1.set_room(choice)
+
+        #         class1.set_instructor(course.get_instructors())
+        #         self._classes.append(class1)
+
+        #         class2 = Lecture(self._classNumb, dept, course)
+        #         self._classNumb += 1
+        #         if college == 'CST' or college == 'CMSS':
+        #             class2.set_meetingTime(thursdayService_meetingTimes[index+1])
+        #         else:
+        #             class2.set_meetingTime(tuesdayService_meetingTimes[index+1])
+        #         class2.set_room(choice)
+                
+        #         class2.set_instructor(course.get_instructors())
+        #         self._classes.append(class2)
+
+        #         class3 = Lecture(self._classNumb, dept, course)
+        #         self._classNumb += 1
+        #         while True:
+        #             meeting_times = thursdayService_meetingTimes if college in ['CST', 'CMSS'] else tuesdayService_meetingTimes
+        #             class3.set_meetingTime(rnd.choice(meeting_times))
+        #             if class3.get_meetingTime().get_sub() != class1.get_meetingTime().get_sub():
+        #                 break 
+
+        #         # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #         rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #         choice = rnd.choice(rooms)
+        #         class3.set_room(choice)
+                
+        #         class3.set_instructor(course.get_instructors())
+        #         self._classes.append(class3)
+                
+        #         course.set_class1(class1)
+        #         course.set_class2(class2)
+        #         course.set_class3(class3)
+    
+        #     done.append(course)
+        # # This is for the rest
+        # for course in courses:
+        #     Dept = depts.get(course.get_number())
+        #     dept = Department(Dept, dbMgr._select_dept_courses(Dept))
+
+        #     if course not in done:
+                    
+        #         if course.get_credit_hours() == 1:
+        #             newClass = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             # Here I will check for their service days and set a meeting time appropriately
+        #             college = course_colleges.get(course.get_number())
+                    
+        #             if college == 'CST' or college == 'CMSS':
+        #                 newClass.set_meetingTime(rnd.choice(thursdayService_meetingTimes))
+        #             else:
+        #                 newClass.set_meetingTime(rnd.choice(tuesdayService_meetingTimes))
+                    
+        #             # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #             rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #             choice = rnd.choice(rooms)
+        #             newClass.set_room(choice)
+
+        #             newClass.set_instructor(course.get_instructors())
+        #             self._classes.append(newClass)
+        #             course.set_class1(newClass)
+
+        #         if course.get_credit_hours() == 2 or course.get_credit_hours() == 0:
+        #             class1 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             # Here I will check for their service days and set a meeting time appropriately
+        #             college = course_colleges.get(course.get_number())
+                    
+        #             if college == 'CST' or college == 'CMSS':
+        #                 index = rnd.randrange(0, len(thursdayService_meetingTimes)-1)
+        #                 if thursdayService_meetingTimes[index].get_sub() != thursdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #                 class1.set_meetingTime(thursdayService_meetingTimes[index])
+        #             else:
+        #                 index = rnd.randrange(0, len(tuesdayService_meetingTimes)-1)
+        #                 if tuesdayService_meetingTimes[index].get_sub() != tuesdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #                 class1.set_meetingTime(tuesdayService_meetingTimes[index])
+                    
+        #             # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #             rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #             choice = rnd.choice(rooms)
+        #             class1.set_room(choice)
+
+        #             class1.set_instructor(course.get_instructors())
+        #             self._classes.append(class1)
+
+        #             class2 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+                    
+        #             if college == 'CST' or college == 'CMSS':
+        #                 class2.set_meetingTime(thursdayService_meetingTimes[index+1])
+        #             else:
+        #                 class2.set_meetingTime(tuesdayService_meetingTimes[index+1])
+                    
+        #             class2.set_room(choice)
+                    
+        #             class2.set_instructor(course.get_instructors())
+        #             self._classes.append(class2)
+
+        #             course.set_class1(class1)
+        #             course.set_class2(class2)
+
+        #         if course.get_credit_hours() == 3:
+                    
+        #             class1 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             # Here I will check for their service days and set a meeting time appropriately
+        #             college = course_colleges.get(course.get_number())
+                    
+        #             if college == 'CST' or college == 'CMSS':
+        #                 index = rnd.randrange(0, len(thursdayService_meetingTimes)-1)
+        #                 if thursdayService_meetingTimes[index].get_sub() != thursdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #                 class1.set_meetingTime(thursdayService_meetingTimes[index])
+        #             else:
+        #                 index = rnd.randrange(0, len(tuesdayService_meetingTimes)-1)
+        #                 if tuesdayService_meetingTimes[index].get_sub() != tuesdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
+        #                 class1.set_meetingTime(tuesdayService_meetingTimes[index])
+                    
+        #             # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #             rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #             choice = rnd.choice(rooms)
+        #             class1.set_room(choice)
+
+        #             class1.set_instructor(course.get_instructors())
+        #             self._classes.append(class1)
+
+        #             class2 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             if college == 'CST' or college == 'CMSS':
+        #                 class2.set_meetingTime(thursdayService_meetingTimes[index+1])
+        #             else:
+        #                 class2.set_meetingTime(tuesdayService_meetingTimes[index+1])
+        #             class2.set_room(choice)
+                    
+        #             class2.set_instructor(course.get_instructors())
+        #             self._classes.append(class2)
+
+        #             class3 = Lecture(self._classNumb, dept, course)
+        #             self._classNumb += 1
+        #             while True:
+        #                 meeting_times = thursdayService_meetingTimes if college in ['CST', 'CMSS'] else tuesdayService_meetingTimes
+        #                 class3.set_meetingTime(rnd.choice(meeting_times))
+        #                 if class3.get_meetingTime().get_sub() != class1.get_meetingTime().get_sub():
+        #                     break 
+
+        #             # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
+        #             rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
+        #             choice = rnd.choice(rooms)
+        #             class3.set_room(choice)
+                    
+        #             class3.set_instructor(course.get_instructors())
+        #             self._classes.append(class3)
+                    
+        #             course.set_class1(class1)
+        #             course.set_class2(class2)
+        #             course.set_class3(class3)
+        
+        #         done.append(course)
+
         for dept in depts:
             courses = dept.get_courses()
+
             for course in courses:
+                
+                
+                 
                 # my attempt at ensuring that the credit hours constraint is met
-                meeting_times = dbMgr.get_meetingTimes()
+                
                 if course.get_credit_hours() == 1:
                     newClass = Lecture(self._classNumb, dept, course)
                     self._classNumb += 1
@@ -66,11 +553,6 @@ class Schedule:
                         newClass.set_meetingTime(rnd.choice(thursdayService_meetingTimes))
                     else:
                         newClass.set_meetingTime(rnd.choice(tuesdayService_meetingTimes))
-                    # # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
-                    # if course.get_maxNumbOfStudents() >= 400:
-                    #     newClass.set_room(bigRoom[rnd.randrange(0, len(bigRoom))])
-                    # else:
-                    #     newClass.set_room(smallRoom[rnd.randrange(0, len(smallRoom))])
                     
                     # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
                     rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
@@ -95,12 +577,6 @@ class Schedule:
                         index = rnd.randrange(0, len(tuesdayService_meetingTimes)-1)
                         if tuesdayService_meetingTimes[index].get_sub() != tuesdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
                         class1.set_meetingTime(tuesdayService_meetingTimes[index])
-                    # # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
-                    # if course.get_maxNumbOfStudents() > 300:
-                    #     room = bigRoom[rnd.randrange(0, len(bigRoom))]
-                    # else:
-                    #     room = smallRoom[rnd.randrange(0, len(smallRoom))]
-                    # class1.set_room(room)
                     
                     # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
                     rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
@@ -141,12 +617,6 @@ class Schedule:
                         index = rnd.randrange(0, len(tuesdayService_meetingTimes)-1)
                         if tuesdayService_meetingTimes[index].get_sub() != tuesdayService_meetingTimes[index + 1].get_sub(): index -= 1 # This was to account for consecutive meeting times that would mean last period of a day and first of the next
                         class1.set_meetingTime(tuesdayService_meetingTimes[index])
-                    # # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
-                    # if course.get_maxNumbOfStudents() >= 400:
-                    #     room = bigRoom[rnd.randrange(0, len(bigRoom))]
-                    # else:
-                    #     room = smallRoom[rnd.randrange(0, len(smallRoom))]
-                    # class1.set_room(room)
                     
                     # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
                     rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
@@ -174,12 +644,6 @@ class Schedule:
                         class3.set_meetingTime(rnd.choice(meeting_times))
                         if class3.get_meetingTime().get_sub() != class1.get_meetingTime().get_sub():
                             break 
-                    # # Here I need to check if the number of students in the course is greater than the seating capacity of small rooms
-                    # if course.get_maxNumbOfStudents() >= 400:
-                    #     room = bigRoom[rnd.randrange(0, len(bigRoom))]
-                    # else:
-                    #     room = smallRoom[rnd.randrange(0, len(smallRoom))]
-                    # class3.set_room(room)
 
                     # New strategy for room assignment: Only assign rooms from rooms that can contain the number of students in the course
                     rooms = [room for room in dbMgr.get_rooms() if room.get_seatingCapacity() >= course.get_maxNumbOfStudents()]
@@ -192,6 +656,7 @@ class Schedule:
                     course.set_class1(class1)
                     course.set_class2(class2)
                     course.set_class3(class3)
+        
         return self
 
     # Calculates the fitness of the schedule
@@ -348,7 +813,7 @@ class Schedule:
             masterSchedule.append(newLecture)
             
 
-        # print(test_list, cc_list, cc_list2)
+        print(test_list, cc_list, cc_list2)
         # print(len(classes),len(masterSchedule))
         return 1 / ((1.0 * len(self._conflicts) + 1))
     

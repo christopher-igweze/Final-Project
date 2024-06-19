@@ -86,6 +86,15 @@ class DBMgr:
         for i in range(0, len(self._depts)):
             self._numberOfClasses += len(self._depts[i].get_courses())
 
+    # Returns dictionary of course:dept pair
+    def _select_courseDept(self) -> dict:
+        self._c.execute("SELECT * FROM dept_course")
+        pairs = self._c.fetchall()
+        returnPairs = {}
+        for i in range(0, len(pairs)):
+            returnPairs.update({pairs[i][1] : pairs[i][0]})
+        return returnPairs
+
     # Returns the list of rooms. [room number, room seating capacity]
     def _select_rooms(self) -> list[Room]:
         self._c.execute("SELECT * FROM room")
