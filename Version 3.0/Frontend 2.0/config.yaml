@@ -10,12 +10,17 @@ credentials:
       logged_in: false
       name: Honour Adewunmi
       password: $2b$12$QLK5sJyV.2xx3mX.gJezOulphpsRTzWakvfXid1SnHebUSdXenclq
+    jd:
+      email: johndoe@gmail.com
+      logged_in: false
+      name: john
+      password: $2b$12$GTpchIF1kEuA0ujD0DYUuetCJbdjwDPNoGjBwGp5mvQJsgynj1nJW
     masterchief:
       email: timetableofficer@covenantuniversity.edu.ng
       failed_login_attempts: 0
       logged_in: false
       name: Ifeanyi Igweze
-      password: admin
+      password: $2b$12$g9kSbAKn8JGQ7mSjjFPIV.jk6oVz9eNSufi0Au30p7bBhSIsI.qKm
 pre-authorized:
   emails:
   - timetableofficer@covenantuniversity.edu.ng

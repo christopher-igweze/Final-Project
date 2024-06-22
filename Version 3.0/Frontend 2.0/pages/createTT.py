@@ -88,12 +88,12 @@ if "visibility" not in st.session_state:
          st.success('Timetable finished. Navigate to timetable from the sidebar.')
 
 
-# if st.button("test", key="test"):
-#     with st.spinner('Creating timetable...'):
-#         proc = subprocess.Popen(['python', 'C:/Users/USER/Documents/Important Files/Final Project/Version 3.0/main.py'], stdin=subprocess.PIPE)
-#         proc.communicate(input=b'f\n')   
+if st.button("test", key="test"):
+    with st.spinner('Creating timetable...'):
+        proc = subprocess.Popen(['python', 'C:/Users/USER/Documents/Important Files/Final Project/Version 3.0/main.py'], stdin=subprocess.PIPE)
+        proc.communicate(input=b'f\n')   
 
-#     st.success('Timetable finished. Navigate to timetable from the sidebar.')
+    st.success('Timetable finished. Navigate to timetable from the sidebar.')
         
     
 
