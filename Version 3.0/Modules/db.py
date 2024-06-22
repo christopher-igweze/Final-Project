@@ -2,11 +2,10 @@ import glob
 import openpyxl
 import sqlite3
 import itertools
+from ..Frontend.pages.createTT import alpha
 
 master_folder = r'C:\Users\USER\Documents\Important Files\Final Project\Version 3.0\extracted_folder\master'
 db_file = r'C:\Users\USER\Documents\Important Files\Final Project\Version 3.0\class_schedule-02.db'
-
-alpha = False
 
 # Create a connection with the db
 conn = sqlite3.connect(db_file)
