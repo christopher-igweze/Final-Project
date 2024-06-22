@@ -79,6 +79,8 @@ if "visibility" not in st.session_state:
         placeholder="Select a semester...",
     )
 
+    alpha = True if option == "Alpha" else False
+
     if st.button("Create", key="create", disabled=not option or uploaded_file is None):
          store()
          with st.spinner('Creating timetable...'):
