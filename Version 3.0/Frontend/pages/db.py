@@ -17,8 +17,13 @@ st.set_page_config(
 menu()
 load_css()
 
+master_folder = r'C:\Users\USER\Documents\Important Files\Final Project\Version 3.0\extracted_folder'
+# Get all folders in the directory
+folders = [folder for folder in os.listdir(master_folder) if os.path.isdir(os.path.join(master_folder, folder))]
+
+folder_path = os.path.join(master_folder, folders[0])
 # Directory containing the Excel files
-EXCEL_DIR = "../extracted_folder/master"
+EXCEL_DIR = folder_path
 
 # Initialize session state variables
 if 'active_page' not in st.session_state:

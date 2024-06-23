@@ -4,7 +4,7 @@ import streamlit as st
 import yaml, os
 import streamlit_authenticator as stauth
 from yaml.loader import SafeLoader
-from utils import load_css, menu
+from utils import load_css, menu, email
 import time
 
 st.set_page_config(
@@ -76,14 +76,15 @@ try:
         # st.success('New password to be sent securely')
         with open(path, 'w') as file:
                 yaml.dump(config, file, default_flow_style=False)
-        # i'll set up an email system later
+        value = True
+        email(email_of_forgotten_password, new_random_password, value)
         container = st.empty()
-        container.success(f"Here's the new password: {new_random_password}")  # Create a success alert
+        container.success("New password has been sent to your email\nCheck your spam/junk folder")  # Create a success alert
         time.sleep(6)  # Wait 6 seconds
         container.empty()
         # The developer should securely transfer the new password to the user.
-    elif username_of_forgotten_password == False:
-        st.error('Username not found')
+    elif email_of_forgotten_password == False:
+        st.error('Email not found')
 except Exception as e:
     st.error(e)
 
@@ -92,17 +93,18 @@ except Exception as e:
 # Creating a forgot username widget
 try:
     username_of_forgotten_username, email_of_forgotten_username = authenticator.forgot_username(clear_on_submit=True)
-    if username_of_forgotten_username:
+    if email_of_forgotten_username:
         # st.success('Username to be sent securely')
         with open(path, 'w') as file:
                 yaml.dump(config, file, default_flow_style=False)
-        # i'll set up an email system later
+        value = False
+        email(email_of_forgotten_username, username_of_forgotten_username, value)
         container = st.empty()
-        container.success(f"Here's your username: {username_of_forgotten_username}")  # Create a success alert
-        time.sleep(6)  # Wait 6 seconds
+        container.success("Your username has been sent to your email\nCheck your spam/junk folder")  # Create a success alert
+        time.sleep(6)  # Wait 2 seconds
         container.empty()
         # The developer should securely transfer the username to the user.
-    elif username_of_forgotten_username == False:
+    elif email_of_forgotten_username == False:
         st.error('Email not found')
 except Exception as e:
     st.error(e)

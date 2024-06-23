@@ -3,7 +3,7 @@ import sqlite3 as sqlite
 import os
 
 # used this to store the path of the database file
-db_path = os.path.join(os.path.dirname(__file__), '..', 'class_schedule-01.db')
+db_path = os.path.join(os.path.dirname(__file__), '..', 'class_schedule-02.db')
 
 # Class to store details of each room from the database
 class Room:
@@ -45,7 +45,7 @@ class Department:
 
 # Class to store details of each course from the database and it's placement in the timetable 
 class Course:
-    def __init__(self, number, name, instructors, maxNumbOfStudents, creditHours, class1=None, class2=None, class3=None):
+    def __init__(self, number, name, instructors, maxNumbOfStudents, creditHours, students, class1=None, class2=None, class3=None):
         self._number = number
         self._name = name
         self._maxNumbOfStudents = maxNumbOfStudents
@@ -54,6 +54,7 @@ class Course:
         self._c1 = class1
         self._c2 = class2
         self._c3 = class3
+        self._students = students
     def get_number(self): return self._number
     def get_name(self): return self._name
     def get_instructors(self): return self._instructors
@@ -62,6 +63,7 @@ class Course:
     def get_class1(self): return self._c1
     def get_class2(self): return self._c2
     def get_class3(self): return self._c3
+    def get_students(self): return self._students
     def set_class1(self, period): self._c1 = period
     def set_class2(self, period): self._c2 = period
     def set_class3(self, period): self._c3 = period
@@ -79,6 +81,7 @@ class DBMgr:
         self._rooms = self._select_rooms()
         self._meetingTimes = self._select_meeting_times()
         self._instructors = self._select_instructors()
+        self._students = self._select_students()
         self._courses = self._select_courses()
         self._depts = self._select_depts()
         self._colleges = self._select_colleges() # to store the colleges of each course
@@ -123,6 +126,15 @@ class DBMgr:
             returnInstructors.append(Instructor(instructors[i][0], instructors[i][1], self._select_instructor_availability(instructors[i][0])))
         return returnInstructors
     
+    def _select_students(self) -> list:
+        self._c.execute("SELECT * FROM course_student")
+        students = self._c.fetchall()
+        returnStudents = []
+        for i in range(0, len(students)):
+            returnStudents.append(students[i][1])
+            returnStudents = list(set(returnStudents))
+        return returnStudents
+    
     # Returns the instructors availability. A list of all meeting IDs the instructor is available (I have to take this function down)
     def _select_instructor_availability(self, instructor):
         self._c.execute("SELECT * from instructor_availability where instructor_id = '" + instructor + "'")
@@ -157,9 +169,7 @@ class DBMgr:
         courses = self._c.fetchall()
         returnCourses = []
         for i in range(0, len(courses)):
-            returnCourses.append(
-                Course(courses[i][0], courses[i][1], self._select_course_instructors(courses[i][0]), 
-                        courses[i][2], courses[i][3]))
+            returnCourses.append(Course(courses[i][0], courses[i][1], self._select_course_instructors(courses[i][0]), courses[i][2], courses[i][3], self._select_course_students(courses[i][0])))
         return returnCourses
 
     # Returns the list of departments. [depts, courses]
@@ -183,6 +193,14 @@ class DBMgr:
            if  self._instructors[i].get_id() in instructorNumbers:
                returnValue.append(self._instructors[i])
         return returnValue
+    
+    def _select_course_students(self, courseNumber):
+        self._c.execute("SELECT * FROM course_student where course_id == '" + courseNumber + "'")
+        dbStudentNumbers = self._c.fetchall()
+        studentNumbers = []
+        for i in range(0, len(dbStudentNumbers)):
+            studentNumbers.append(dbStudentNumbers[i][1])
+        return studentNumbers
     
     # Returns the list of courses for a department. [dept name, course id]
     def _select_dept_courses(self, deptName):

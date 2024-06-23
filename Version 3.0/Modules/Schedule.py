@@ -537,10 +537,7 @@ class Schedule:
         for dept in depts:
             courses = dept.get_courses()
 
-            for course in courses:
-                
-                
-                 
+            for course in courses: 
                 # my attempt at ensuring that the credit hours constraint is met
                 
                 if course.get_credit_hours() == 1:
@@ -725,6 +722,18 @@ class Schedule:
                     newLecture.set_meetingTime(theMT)
                     newLecture.set_instructor(theinstructor)
             
+            for j in range(0, len(classes)):
+
+                if (classes[j].get_course().get_number() != classes[i].get_course().get_number()):
+
+                    if (classes[i].get_meetingTime() == classes[j].get_meetingTime() and classes[i].get_id() != classes[j].get_id()):
+
+                        if set(classes[i].get_course().get_students()) & set(classes[j].get_course().get_students()):
+
+                            studentBookingConflict = list(set(classes[i].get_course().get_students()) & set(classes[j].get_course().get_students()))
+                            cc = [classes[i].get_course(), classes[j].get_course(), studentBookingConflict]
+                            self._conflicts.append(Conflict(ConflictType.STUDENT_AVAILABILITY, cc))
+                            test_list.append(8)
 
             # I need to create a constraint for consecutive instructor and room booking for two unit and three unit courses (maybe should be a soft constraint)
             # Seating Capacity Constraint
@@ -805,6 +814,12 @@ class Schedule:
                             self._conflicts.append(Conflict(ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
                             test_list.append(7)
 
+                        if set(classes[i].get_course().get_students()) & set(classes[j].get_course().get_students()):
+                            studentBookingConflict = list(set(classes[i].get_course().get_students()) & set(classes[j].get_course().get_students()))
+                            cc = [classes[i].get_course(), classes[j].get_course(), studentBookingConflict]
+                            self._conflicts.append(Conflict(ConflictType.STUDENT_AVAILABILITY, cc))
+                            test_list.append(8)
+
 
         # I need to work on the fitness function so it assigns weights to the conflicts.
         # The weights would be the multiplicative factor
@@ -813,7 +828,7 @@ class Schedule:
             masterSchedule.append(newLecture)
             
 
-        print(test_list, cc_list, cc_list2)
+        # print(test_list, cc_list, cc_list2)
         # print(len(classes),len(masterSchedule))
         return 1 / ((1.0 * len(self._conflicts) + 1))
     
@@ -855,9 +870,10 @@ class ConflictType(enum.Enum):
         INSTRUCTOR_BOOKING = 1
         ROOM_BOOKING = 2
         NUMB_OF_STUDENTS = 3
-        INSTRUCTOR_AVAILABILITY = 4
+        INSTRUCTOR_AVAILABILITY = 4 #chapel
         CREDIT_HOURS = 5
         CONSECUTIVE_ROOM_BOOKING = 6
+        STUDENT_AVAILABILITY = 7
 
 class Conflict:
 

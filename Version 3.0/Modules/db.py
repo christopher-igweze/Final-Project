@@ -3,8 +3,15 @@ import openpyxl
 import sqlite3
 import itertools
 from ..Frontend.pages.createTT import alpha
+import os
 
-master_folder = r'C:\Users\USER\Documents\Important Files\Final Project\Version 3.0\extracted_folder\master'
+master_folder = r'C:\Users\USER\Documents\Important Files\Final Project\Version 3.0\extracted_folder'
+
+# Get all folders in the directory
+folders = [folder for folder in os.listdir(master_folder) if os.path.isdir(os.path.join(master_folder, folder))]
+
+folder_path = os.path.join(master_folder, folders[0])
+
 db_file = r'C:\Users\USER\Documents\Important Files\Final Project\Version 3.0\class_schedule-02.db'
 
 # Create a connection with the db
@@ -30,7 +37,7 @@ course_dict = {}
 students = {}
 student_idList = []
 # Loop through the files in the master folder
-for file_path in glob.glob(master_folder + '/*.xlsx'):
+for file_path in glob.glob(folder_path + '/*.xlsx'):
     # Loop through the sheets of each workbook
     workbook = openpyxl.load_workbook(file_path)
     if alpha == False:

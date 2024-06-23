@@ -10,11 +10,18 @@ credentials:
       logged_in: false
       name: Honour Adewunmi
       password: $2b$12$QLK5sJyV.2xx3mX.gJezOulphpsRTzWakvfXid1SnHebUSdXenclq
+    honourboy:
+      email: honouradewunmi12@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
+      name: Mayowa Adewunmi
+      password: $2b$12$CI/qPBYEAFOXK88.8A46ueBO0dn1BozdJJ8zMo53X.mq8fDdk3tA2
     jd:
-      email: johndoe@gmail.com
+      email: fizzybabz456@gmail.com
+      failed_login_attempts: 0
       logged_in: false
       name: john
-      password: $2b$12$GTpchIF1kEuA0ujD0DYUuetCJbdjwDPNoGjBwGp5mvQJsgynj1nJW
+      password: $2b$12$iHTAM3EptomGYXmiH9BAqeKubaJxqXLkirGn/rRlpj9JzuYIGj.8i
     masterchief:
       email: timetableofficer@covenantuniversity.edu.ng
       failed_login_attempts: 0
