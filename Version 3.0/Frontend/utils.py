@@ -36,6 +36,19 @@ def menu():
     #     authenticator.logout()
     #     st.switch_page("app.py")
 
+def guestMenu():
+    st.sidebar.image("assets/images/cu2.png", width=200, use_column_width=True)
+    st.sidebar.page_link("app.py", label="👈🏼 Logout")
+    # st.sidebar.page_link("pages/db.py", label="📂 Database")
+    # st.sidebar.page_link("pages/createTT.py", label="🔨 Create Timetable")
+    st.sidebar.page_link("pages/viewTT.py", label="📄 View Timetable")
+    # st.sidebar.page_link("pages/constraints.py", label="🔒 Constraints")
+    # st.sidebar.page_link("pages/profile.py", label="🧙🏼‍♂️ Profile")
+    # st.sidebar.markdown("---")
+    # if st.sidebar.button("Logout", key="logoutbutton", type="secondary"):
+    #     authenticator.logout()
+    #     st.switch_page("app.py")
+
 def email(email, password, value):
     HOST = "smtp-mail.outlook.com"
     PORT = 587

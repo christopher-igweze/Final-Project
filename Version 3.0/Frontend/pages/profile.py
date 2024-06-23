@@ -6,6 +6,7 @@ import streamlit_authenticator as stauth
 from yaml.loader import SafeLoader
 from utils import load_css, menu, email
 import time
+from user_db import update_database
 
 st.set_page_config(
     page_title="CU Timetable App",
@@ -54,6 +55,7 @@ if st.session_state["authentication_status"]:
             st.success('Password modified successfully')
             with open(path, 'w') as file:
                 yaml.dump(config, file, default_flow_style=False)
+            update_database()
     except Exception as e:
         st.error(e)
 
@@ -64,7 +66,8 @@ try:
     if email_of_registered_user:
         st.success('User registered successfully')
         with open(path, 'w') as file:
-                yaml.dump(config, file, default_flow_style=False)
+            yaml.dump(config, file, default_flow_style=False)
+        update_database() 
 except Exception as e:
     st.error(e)
 
@@ -80,6 +83,7 @@ try:
         email(email_of_forgotten_password, new_random_password, value)
         container = st.empty()
         container.success("New password has been sent to your email\nCheck your spam/junk folder")  # Create a success alert
+        update_database()
         time.sleep(6)  # Wait 6 seconds
         container.empty()
         # The developer should securely transfer the new password to the user.
@@ -116,5 +120,6 @@ if st.session_state["authentication_status"]:
             st.success('Entries updated successfully')
             with open(path, 'w') as file:
                 yaml.dump(config, file, default_flow_style=False)
+            update_database()
     except Exception as e:
         st.error(e)

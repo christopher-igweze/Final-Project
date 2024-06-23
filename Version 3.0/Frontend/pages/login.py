@@ -4,6 +4,7 @@ import yaml, os
 import streamlit_authenticator as stauth
 from yaml.loader import SafeLoader
 import time
+from user_db import update_database
 
 st.set_page_config(
     page_title="CU Timetable App",
@@ -54,6 +55,7 @@ def forgot_password():
             email(email_of_forgotten_password, new_random_password, value)
             container = st.empty()
             container.success("New password has been sent to your email. Check your spam/junk folder")  # Create a success alert
+            update_database()
             time.sleep(6)  # Wait 6 seconds
             container.empty()
             # The developer should securely transfer the new password to the user.
@@ -93,3 +95,6 @@ with col1:
 with col2:
     with st.popover("Forgot Password"):
         forgot_password()
+
+if st.button('Login as Student / Lecturer'):
+    st.switch_page("pages/guestViewTT.py")

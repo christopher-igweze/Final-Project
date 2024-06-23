@@ -4,6 +4,12 @@ cookie:
   name: loginCookie
 credentials:
   usernames:
+    admin2:
+      email: ifeanyi123igweze@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
+      name: Ifeanyi Christopher Igweze
+      password: $2b$12$HhvQStBbbXrAsS9woedN/.FijS05ufrHumglvOPjYWp0uv0PhJHcu
     hboy:
       email: CIStimetableofficer@covenantuniversity.edu.ng
       failed_login_attempts: 0
@@ -23,11 +29,17 @@ credentials:
       name: john
       password: $2b$12$iHTAM3EptomGYXmiH9BAqeKubaJxqXLkirGn/rRlpj9JzuYIGj.8i
     masterchief:
-      email: timetableofficer@covenantuniversity.edu.ng
+      email: mcphilo100@gmail.com
       failed_login_attempts: 0
       logged_in: false
-      name: Ifeanyi Igweze
+      name: Test Update
       password: $2b$12$g9kSbAKn8JGQ7mSjjFPIV.jk6oVz9eNSufi0Au30p7bBhSIsI.qKm
+    tesfaye:
+      email: fisayobabz@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
+      name: Fisayo Babatunde
+      password: $2b$12$PR9TeTNmmds4wpfdqEBrP.UR984g6YPMXkKQTqfG1L.E1nz.Fi0mO
 pre-authorized:
   emails:
   - timetableofficer@covenantuniversity.edu.ng
