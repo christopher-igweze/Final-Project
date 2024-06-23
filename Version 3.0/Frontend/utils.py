@@ -26,7 +26,7 @@ def load_css():
 def menu():
     st.sidebar.image("assets/images/cu2.png", width=200, use_column_width=True)
     st.sidebar.page_link("app.py", label="🏡 Home")
-    st.sidebar.page_link("pages/db.py", label="📂 Database")
+    st.sidebar.page_link("pages/db.py", label="📂 Program Data")
     st.sidebar.page_link("pages/createTT.py", label="🔨 Create Timetable")
     st.sidebar.page_link("pages/viewTT.py", label="📄 View Timetable")
     # st.sidebar.page_link("pages/constraints.py", label="🔒 Constraints")

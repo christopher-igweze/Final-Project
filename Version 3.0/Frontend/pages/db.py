@@ -38,7 +38,7 @@ def list_excel_files(directory):
 # Function to display the list of Excel files
 def display_file_list():
     # st.image("assets/images/cu.png")
-    st.title("Database Page")
+    st.title("Course Registrations")
     st.subheader("Programs")
     files = list_excel_files(EXCEL_DIR)
     for file in files:
