@@ -722,18 +722,18 @@ class Schedule:
                     newLecture.set_meetingTime(theMT)
                     newLecture.set_instructor(theinstructor)
             
-            for j in range(0, len(classes)):
+            # for j in range(0, len(classes)):
 
-                if (classes[j].get_course().get_number() != classes[i].get_course().get_number()):
+            #     if (classes[j].get_course().get_number() != classes[i].get_course().get_number()):
 
-                    if (classes[i].get_meetingTime() == classes[j].get_meetingTime() and classes[i].get_id() != classes[j].get_id()):
+            #         if (classes[i].get_meetingTime() == classes[j].get_meetingTime() and classes[i].get_id() != classes[j].get_id()):
 
-                        if set(classes[i].get_course().get_students()) & set(classes[j].get_course().get_students()):
+            #             if set(classes[i].get_course().get_students()) & set(classes[j].get_course().get_students()):
 
-                            studentBookingConflict = list(set(classes[i].get_course().get_students()) & set(classes[j].get_course().get_students()))
-                            cc = [classes[i].get_course(), classes[j].get_course(), studentBookingConflict]
-                            self._conflicts.append(Conflict(ConflictType.STUDENT_AVAILABILITY, cc))
-                            test_list.append(8)
+            #                 studentBookingConflict = list(set(classes[i].get_course().get_students()) & set(classes[j].get_course().get_students()))
+            #                 cc = [classes[i].get_course(), classes[j].get_course(), studentBookingConflict]
+            #                 self._conflicts.append(Conflict(ConflictType.STUDENT_AVAILABILITY, cc))
+            #                 test_list.append(8)
 
             # I need to create a constraint for consecutive instructor and room booking for two unit and three unit courses (maybe should be a soft constraint)
             # Seating Capacity Constraint
@@ -814,11 +814,11 @@ class Schedule:
                             self._conflicts.append(Conflict(ConflictType.INSTRUCTOR_BOOKING, instructorBookingConflict))
                             test_list.append(7)
 
-                        if set(classes[i].get_course().get_students()) & set(classes[j].get_course().get_students()):
-                            studentBookingConflict = list(set(classes[i].get_course().get_students()) & set(classes[j].get_course().get_students()))
-                            cc = [classes[i].get_course(), classes[j].get_course(), studentBookingConflict]
-                            self._conflicts.append(Conflict(ConflictType.STUDENT_AVAILABILITY, cc))
-                            test_list.append(8)
+                        # if set(classes[i].get_course().get_students()) & set(classes[j].get_course().get_students()):
+                        #     studentBookingConflict = list(set(classes[i].get_course().get_students()) & set(classes[j].get_course().get_students()))
+                        #     cc = [classes[i].get_course(), classes[j].get_course(), studentBookingConflict]
+                        #     self._conflicts.append(Conflict(ConflictType.STUDENT_AVAILABILITY, cc))
+                        #     test_list.append(8)
 
 
         # I need to work on the fitness function so it assigns weights to the conflicts.
