@@ -1,6 +1,6 @@
 import streamlit as st
 from utils import load_css, menu
-import datetime
+from datetime import timedelta
 
 st.set_page_config(
     page_title="CU Timetable App",
@@ -23,8 +23,6 @@ st.subheader("SET POPULATION SIZE")
 size = st.number_input("Set population size: ", value=20)
 st.divider()
 st.subheader("SET COMPUTE LIMIT")
-if "visibility" not in st.session_state:
-    st.session_state.visibility = "visible"
 limit = st.radio(
     "What's the limit of the computation?",
     ["Time Limit", "Iteration Limit"],
@@ -32,7 +30,9 @@ limit = st.radio(
 )
 if limit == "Time Limit":
     time = st.time_input("Set time limit: ", value=None, step=180)
-    time = time.hour * 3600 + time.minute * 60 # type: ignore
+    if time:
+        # Convert the time input to seconds
+        total_seconds = timedelta(hours=time.hour, minutes=time.minute, seconds=time.second).total_seconds()
     st.write("Time limit is set for", time)
     max = None
 else:
