@@ -6,15 +6,17 @@ from Modules.Display import DisplayMgr
 from Modules.Genetic_Algo import GeneticAlgorithm
 from Modules.Schedule import Schedule, updatedSchedule, finalSchedule
 from Modules.Excel import output_schedule
-from Frontend.pages.constraints import time, max
-import time as t
+from Frontend.pages.constraints import time as t
+from Frontend.pages.constraints import max
+import time
 
 # Define maximum iterations and time; set to None to disable
 MAX_ITERATIONS = max
-MAX_TIME = time # Maximum time in seconds   
+MAX_TIME = t # Maximum time in seconds   
 
 # Function to find the fittest schedule
 def find_fittest_schedule(verboseFlag):
+    start_time = time.time()  # Record the start time
     # Initialize generation number
     generationNumber = 0
     # Print the generation number if verbose flag is True
@@ -32,6 +34,14 @@ def find_fittest_schedule(verboseFlag):
     geneticAlgorithm = GeneticAlgorithm()
     # Keep evolving the population until a perfect schedule is found
     while (population.get_schedules()[0].get_fitness() != 1.0):
+        # Check if maximum iterations is reached
+        if MAX_ITERATIONS is not None and generationNumber >= MAX_ITERATIONS:
+            print("> Maximum iterations reached without finding a perfect solution.")
+            break
+        # Check if maximum time is exceeded
+        if MAX_TIME is not None and (time.time() - start_time) > MAX_TIME:
+            print("> Maximum time exceeded without finding a perfect solution.")
+            break
         # Increment the generation number
         generationNumber += 1
         # Print the generation number if verbose flag is True
@@ -46,7 +56,10 @@ def find_fittest_schedule(verboseFlag):
             DisplayMgr.display_schedule_as_table(population.get_schedules()[0])
             DisplayMgr.display_schedule_conflicts(population.get_schedules()[0])
     # Print the number of generations it took to find a solution
-    print("> solution found after " + str(generationNumber) + " generations")
+    if population.get_schedules()[0].get_fitness() == 1.0:
+        print("> Solution found after " + str(generationNumber) + " generations")
+    else:
+        print("> Ended after " + str(generationNumber) + " generations without a perfect solution")
     # Return the fittest schedule
     final = finalSchedule()[0]
     DisplayMgr.display_schedule_as_tables(final)
