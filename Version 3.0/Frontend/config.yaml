@@ -10,6 +10,12 @@ credentials:
       logged_in: false
       name: Ifeanyi Christopher Igweze
       password: $2b$12$HhvQStBbbXrAsS9woedN/.FijS05ufrHumglvOPjYWp0uv0PhJHcu
+    eb:
+      email: olaleyefiyin@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
+      name: Elizabeth Olaleye
+      password: $2b$12$xOyktBKAMTvfswt3r/dW1evHAdd36bLsAKS5lcZcK3.SjfxtnSa4m
     hboy:
       email: CIStimetableofficer@covenantuniversity.edu.ng
       failed_login_attempts: 0
@@ -33,7 +39,7 @@ credentials:
       failed_login_attempts: 0
       logged_in: false
       name: Test Update
-      password: $2b$12$g9kSbAKn8JGQ7mSjjFPIV.jk6oVz9eNSufi0Au30p7bBhSIsI.qKm
+      password: $2b$12$qQ/C21FuX8aIheKp6nkseerI8h2n7GUeuFMDECL7u2yhDDXrog5A.
     tesfaye:
       email: fisayobabz@gmail.com
       failed_login_attempts: 0

@@ -6,13 +6,12 @@ from Modules.Display import DisplayMgr
 from Modules.Genetic_Algo import GeneticAlgorithm
 from Modules.Schedule import Schedule, updatedSchedule, finalSchedule
 from Modules.Excel import output_schedule
-from Frontend.pages.constraints import time as t
-from Frontend.pages.constraints import max
+# from Frontend.pages.constraints import returnValues
 import time
 
 # Define maximum iterations and time; set to None to disable
-MAX_ITERATIONS = max
-MAX_TIME = t # Maximum time in seconds   
+MAX_ITERATIONS = 50 # Maximum iterations
+MAX_TIME = None # Maximum time in seconds   
 
 # Function to find the fittest schedule
 def find_fittest_schedule(verboseFlag):
