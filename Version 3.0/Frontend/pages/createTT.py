@@ -23,7 +23,7 @@ if 'active_tab' not in st.session_state:
     st.session_state.active_tab = 'Upload Course Reg'
 
 def store():
-    if uploaded_file is not None:
+    if uploaded_file is not None: # UPLOADED FILE WAS DEFINED OUTSIDE THE FUNCTION
         # Delete any existing files or folders in the directory
         for file_name in os.listdir('../extracted_folder'):
             file_path = os.path.join('../extracted_folder', file_name)
@@ -36,6 +36,8 @@ def store():
         with zipfile.ZipFile(uploaded_file, 'r') as zip_ref:
             zip_ref.extractall('../extracted_folder')
 
+    # Populate the DB
+    proc = subprocess.Popen(['python', 'C:/Users/USER/Documents/Important Files/Final Project/Version 3.0/Modules/db.py'], stdin=subprocess.PIPE)
     # Get the extracted folder path
     # extracted_folder = os.path.join('C:/Users/USER/Documents/Important Files/Final Project/Version 3.0', os.path.splitext(uploaded_file.name)[0])
 

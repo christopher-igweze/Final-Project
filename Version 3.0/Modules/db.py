@@ -2,8 +2,10 @@ import glob
 import openpyxl
 import sqlite3
 import itertools
-from ..Frontend.pages.createTT import alpha
+# from Frontend.pages.createTT import alpha
 import os
+
+alpha = False
 
 master_folder = r'C:\Users\USER\Documents\Important Files\Final Project\Version 3.0\extracted_folder'
 
@@ -57,18 +59,44 @@ for file_path in glob.glob(folder_path + '/*.xlsx'):
                 instructors = str(sheet.cell(row=i, column=4).value).split(',')
                 elective = sheet.cell(row=i, column=6).value
                 course_dict[name] = course_code
-                cursor.execute("SELECT * FROM dept")
-                thisData = cursor.fetchall()
-                dept_row = next((_ for _ in thisData if _[2] == sheet.cell(row=i, column=5).value), None)
-                if dept_row:
-                    dept_value = dept_row[0]
-                    cursor.execute("INSERT INTO course (number, name, max_numb_of_students, credit_hours, Elective) VALUES (?, ?, ?, ?, ?)", (course_code, name, numberOfStudents, units, elective))
-                    cursor.execute("INSERT INTO dept_course (name, course_numb) VALUES (?, ?)", (dept_value, course_code))
-                    for instructor in instructors:
-                        cursor.execute("INSERT INTO course_instructor (course_number, instructor_number) VALUES (?, ?)", (course_code, instructor_dict.get(instructor)))
+                
+                # Check if the course already exists in the database
+                cursor.execute("SELECT * FROM course WHERE name=?", (name,))
+                existing_course = cursor.fetchone()
+                
+                if existing_course:
+                    # Course already exists, update the total number of students
+                    total_students = existing_course[2] + numberOfStudents
+                    cursor.execute("UPDATE course SET max_numb_of_students=? WHERE name=?", (total_students, name))
                 else:
-                    # Handle the case where the department is not found
-                    print(f"Department not found for the course: {name}")
+                    # Course does not exist, insert a new record
+                    cursor.execute("SELECT * FROM dept")
+                    thisData = cursor.fetchall()
+                    dept_row = next((_ for _ in thisData if _[2] == sheet.cell(row=i, column=5).value), None)
+                    if dept_row:
+                        # populate instructor table
+                        cursor.execute("SELECT * FROM instructor")
+                        insData = cursor.fetchall()
+                        prev_id = int(insData[-1][0][1:])
+                        dept_id = dept_row[2]
+                        new_instructors = []
+                        for instructor in instructors:
+                            if instructor not in instructor_dict:
+                                new_id = f"I{prev_id + 1}"
+                                new_instructors.append((new_id, instructor, dept_id))
+                                instructor_dict[instructor] = new_id
+                                prev_id += 1
+                        
+                        cursor.executemany("INSERT INTO instructor (number, name, Dept_id) VALUES (?, ?, ?)", new_instructors)
+
+                        dept_value = dept_row[0]
+                        cursor.execute("INSERT INTO course (number, name, max_numb_of_students, credit_hours, Elective) VALUES (?, ?, ?, ?, ?)", (course_code, name, numberOfStudents, units, elective))
+                        cursor.execute("INSERT INTO dept_course (name, course_numb) VALUES (?, ?)", (dept_value, course_code))
+                        for instructor in instructors:
+                            cursor.execute("INSERT INTO course_instructor (course_number, instructor_number) VALUES (?, ?)", (course_code, instructor_dict.get(instructor)))
+                    else:
+                        # Handle the case where the department is not found
+                        print(f"Department not found for the course: {name}")
 
             
             # Get the number of electives required for the semester
