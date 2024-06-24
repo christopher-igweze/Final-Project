@@ -32,6 +32,7 @@ limit = st.radio(
 )
 if limit == "Time Limit":
     time = st.time_input("Set time limit: ", value=None, step=180)
+    time = time.hour * 3600 + time.minute * 60 # type: ignore
     st.write("Time limit is set for", time)
     max = None
 else:
