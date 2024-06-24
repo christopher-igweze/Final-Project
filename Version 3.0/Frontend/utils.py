@@ -29,7 +29,7 @@ def menu():
     st.sidebar.page_link("pages/db.py", label="📂 Program Data")
     st.sidebar.page_link("pages/createTT.py", label="🔨 Create Timetable")
     st.sidebar.page_link("pages/viewTT.py", label="📄 View Timetable")
-    # st.sidebar.page_link("pages/constraints.py", label="🔒 Constraints")
+    st.sidebar.page_link("pages/constraints.py", label="🔒 Constraints")
     st.sidebar.page_link("pages/profile.py", label="🧙🏼‍♂️ Profile")
     # st.sidebar.markdown("---")
     # if st.sidebar.button("Logout", key="logoutbutton", type="secondary"):
