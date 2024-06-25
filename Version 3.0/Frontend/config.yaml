@@ -4,6 +4,12 @@ cookie:
   name: loginCookie
 credentials:
   usernames:
+    abiodun:
+      email: theresa.abiodun@covenantuniversity.edu.ng
+      failed_login_attempts: 0
+      logged_in: false
+      name: Mrs Abiodun Theresa
+      password: $2b$12$iD0dq0nC5qocAbzc5qE49O3cShjDsBeVmr5.MGU.uxoWmzgh1FYKS
     admin2:
       email: ifeanyi123igweze@gmail.com
       failed_login_attempts: 0

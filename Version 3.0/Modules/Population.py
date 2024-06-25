@@ -20,3 +20,7 @@ class Population:
     # Method to get the list of schedules
     def get_schedules(self): 
         return self._schedules
+    
+    def add_schedules(self, a_schedule : Schedule):
+        self._schedules.append(a_schedule)
+        self._size += 1

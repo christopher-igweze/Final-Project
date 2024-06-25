@@ -891,7 +891,7 @@ class Conflict:
         return str(self._conflictType) + " " + str("  and  ".join(map(str, self._conflictBetweenClasses)))
 
 class updatedSchedule:
-    def __init__(self, solution) -> None:
+    def __init__(self, solution):
         self._solution: list[Lecture] = solution
     def get_solution(self): return self._solution
 

@@ -11,7 +11,7 @@ import time
 
 # Define maximum iterations and time; set to None to disable
 MAX_ITERATIONS = None # Maximum iterations
-MAX_TIME = 61 # Maximum time in seconds   
+MAX_TIME = 300 # Maximum time in seconds   
 
 # Function to find the fittest schedule
 def find_fittest_schedule(verboseFlag):
