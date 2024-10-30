@@ -11,11 +11,11 @@ credentials:
       name: Mrs Abiodun Theresa
       password: $2b$12$iD0dq0nC5qocAbzc5qE49O3cShjDsBeVmr5.MGU.uxoWmzgh1FYKS
     admin2:
-      email: ifeanyi123igweze@gmail.com
+      email: christopher.igweze@gmail.com
       failed_login_attempts: 0
       logged_in: false
       name: Ifeanyi Christopher Igweze
-      password: $2b$12$HhvQStBbbXrAsS9woedN/.FijS05ufrHumglvOPjYWp0uv0PhJHcu
+      password: admin
     eb:
       email: olaleyefiyin@gmail.com
       failed_login_attempts: 0

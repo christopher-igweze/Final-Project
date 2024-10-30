@@ -3,7 +3,7 @@ import sqlite3 as sqlite
 import os
 
 # used this to store the path of the database file
-db_path = os.path.join(os.path.dirname(__file__), '..', 'class_schedule-01.db')
+db_path = os.path.join(os.path.dirname(__file__), '..', 'class_schedule-02.db')
 
 # Class to store details of each room from the database
 class Room:

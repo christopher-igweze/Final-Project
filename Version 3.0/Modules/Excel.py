@@ -36,7 +36,7 @@ def output_schedule():
             mydata.append(row)
         times = [x + 10 for x in times]
         thedata[day] = pd.DataFrame(mydata, columns=columns)
-    with pd.ExcelWriter('C:/Users/USER/Documents/Important Files/Final Project/Version 3.0/sheets/final_timetable.xlsx', engine='openpyxl') as writer:
+    with pd.ExcelWriter('/config/Final-Project/Version 3.0/sheets/final_timetable.xlsx', engine='openpyxl') as writer:
         for day in sheets:
             thedata[day].to_excel(writer, sheet_name=day, index=False)
 

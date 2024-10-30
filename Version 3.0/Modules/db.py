@@ -7,14 +7,14 @@ import os
 
 alpha = False
 
-master_folder = r'C:\Users\USER\Documents\Important Files\Final Project\Version 3.0\extracted_folder'
+master_folder = '/config/Final-Project/Version 3.0/extracted_folder'
 
 # Get all folders in the directory
 folders = [folder for folder in os.listdir(master_folder) if os.path.isdir(os.path.join(master_folder, folder))]
 
 folder_path = os.path.join(master_folder, folders[0])
 
-db_file = r'C:\Users\USER\Documents\Important Files\Final Project\Version 3.0\class_schedule-02.db'
+db_file = '/config/Final-Project/Version 3.0/class_schedule-02.db'
 
 # Create a connection with the db
 conn = sqlite3.connect(db_file)

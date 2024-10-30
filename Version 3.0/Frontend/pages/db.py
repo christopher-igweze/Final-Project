@@ -17,7 +17,7 @@ st.set_page_config(
 menu()
 load_css()
 
-master_folder = r'C:\Users\USER\Documents\Important Files\Final Project\Version 3.0\extracted_folder'
+master_folder = '/config/Final-Project/Version 3.0/extracted_folder'
 # Get all folders in the directory
 folders = [folder for folder in os.listdir(master_folder) if os.path.isdir(os.path.join(master_folder, folder))]
 

@@ -37,7 +37,7 @@ def store():
             zip_ref.extractall('../extracted_folder')
 
     # Populate the DB
-    proc = subprocess.Popen(['python', 'C:/Users/USER/Documents/Important Files/Final Project/Version 3.0/Modules/db.py'], stdin=subprocess.PIPE)
+    proc = subprocess.Popen(['python', '/config/Final-Project/Version 3.0/Frontend/pages/db.py'], stdin=subprocess.PIPE)
     # Get the extracted folder path
     # extracted_folder = os.path.join('C:/Users/USER/Documents/Important Files/Final Project/Version 3.0', os.path.splitext(uploaded_file.name)[0])
 
@@ -86,7 +86,7 @@ if "visibility" not in st.session_state:
     if st.button("Create", key="create", disabled=not option or uploaded_file is None):
          store()
          with st.spinner('Creating timetable...'):
-            proc = subprocess.Popen(['python', 'C:/Users/USER/Documents/Important Files/Final Project/Version 3.0/main.py'], stdin=subprocess.PIPE)
+            proc = subprocess.Popen(['python', '/config/Final-Project/Version 3.0/main.py'], stdin=subprocess.PIPE)
             proc.communicate(input=b'f\n')   
 
          st.success('Timetable finished. Navigate to timetable from the sidebar.')
